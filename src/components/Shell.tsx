@@ -83,15 +83,31 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       );
     }
     if (pathname.startsWith('/finance/')) {
-      const rawSub = pathname.replace('/finance/', '');
-      const formatted = rawSub.charAt(0).toUpperCase() + rawSub.slice(1).replace(/-/g, ' ');
-      return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
-          <span>Finance</span>
-          <span style={{ color: '#94A3B8' }}>&gt;</span>
-          <span style={{ color: '#0B1220', fontWeight: 600 }}>{formatted}</span>
-        </div>
-      );
+      const parts = pathname.replace('/finance/', '').split('/').filter(Boolean);
+      if (parts.length === 1) {
+        const rawSub = parts[0];
+        const formatted = rawSub.charAt(0).toUpperCase() + rawSub.slice(1).replace(/-/g, ' ');
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+            <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+            <span style={{ color: '#94A3B8' }}>&gt;</span>
+            <span style={{ color: '#0B1220', fontWeight: 600 }}>{formatted}</span>
+          </div>
+        );
+      } else if (parts.length >= 2) {
+        const section = parts[0];
+        const subFormatted = section.charAt(0).toUpperCase() + section.slice(1).replace(/-/g, ' ');
+        const detailName = decodeURIComponent(parts[1]).replace(/-/g, ' ');
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+            <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+            <span style={{ color: '#94A3B8' }}>&gt;</span>
+            <Link href={`/finance/${section}`} style={{ color: '#64748B', textDecoration: 'none' }}>{subFormatted}</Link>
+            <span style={{ color: '#94A3B8' }}>&gt;</span>
+            <span style={{ color: '#0B1220', fontWeight: 600 }}>{detailName}</span>
+          </div>
+        );
+      }
     }
     const currentModule = ALL_MODULES.find(m => pathname.startsWith(m.href));
     return (

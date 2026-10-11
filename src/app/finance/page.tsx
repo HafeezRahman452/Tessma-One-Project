@@ -385,16 +385,16 @@ export default function FinanceOverviewPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {[
-                { label: 'Customers', icon: <User size={15} color="#2563EB" /> },
-                { label: 'Sales invoices', icon: <FileText size={15} color="#059669" /> },
-                { label: 'Credit notes', icon: <Receipt size={15} color="#DC2626" /> },
-                { label: 'Receipts', icon: <CreditCard size={15} color="#7C3AED" /> },
-                { label: 'Receivables ageing', icon: <Clock size={15} color="#D97706" /> },
+                { label: 'Customers', href: '/finance/customers', icon: <User size={15} color="#2563EB" /> },
+                { label: 'Sales invoices', href: '/finance/sales-invoices', icon: <FileText size={15} color="#059669" /> },
+                { label: 'Credit notes', href: '/finance/credit-notes', icon: <Receipt size={15} color="#DC2626" /> },
+                { label: 'Receipts', href: '/finance/payments', icon: <CreditCard size={15} color="#7C3AED" /> },
+                { label: 'Receivables ageing', href: '/finance/sales-invoices', icon: <Clock size={15} color="#D97706" /> },
               ].map((item) => (
-                <div
+                <Link
                   key={item.label}
+                  href={item.href}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -405,6 +405,7 @@ export default function FinanceOverviewPage() {
                     fontSize: '12.5px',
                     color: '#334155',
                     fontWeight: 500,
+                    textDecoration: 'none',
                     transition: 'background 0.12s ease',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F1F5F9')}
@@ -415,7 +416,7 @@ export default function FinanceOverviewPage() {
                     <span>{item.label}</span>
                   </div>
                   <CaretRight size={13} color="#94A3B8" />
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -434,13 +435,14 @@ export default function FinanceOverviewPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {[
-                { label: 'Suppliers', icon: <UsersThree size={15} color="#2563EB" /> },
-                { label: 'Supplier bills', icon: <FileText size={15} color="#DC2626" /> },
-                { label: 'Payments', icon: <CreditCard size={15} color="#059669" /> },
-                { label: 'Payables ageing', icon: <Clock size={15} color="#7C3AED" /> },
+                { label: 'Suppliers', href: '/finance/suppliers', icon: <UsersThree size={15} color="#2563EB" /> },
+                { label: 'Supplier bills', href: '/finance/purchase-invoices', icon: <FileText size={15} color="#DC2626" /> },
+                { label: 'Payments', href: '/finance/payments', icon: <CreditCard size={15} color="#059669" /> },
+                { label: 'Payables ageing', href: '/finance/purchase-invoices', icon: <Clock size={15} color="#7C3AED" /> },
               ].map((item) => (
-                <div
+                <Link
                   key={item.label}
+                  href={item.href}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -451,6 +453,7 @@ export default function FinanceOverviewPage() {
                     fontSize: '12.5px',
                     color: '#334155',
                     fontWeight: 500,
+                    textDecoration: 'none',
                     transition: 'background 0.12s ease',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F1F5F9')}
@@ -461,7 +464,7 @@ export default function FinanceOverviewPage() {
                     <span>{item.label}</span>
                   </div>
                   <CaretRight size={13} color="#94A3B8" />
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -672,10 +675,10 @@ export default function FinanceOverviewPage() {
               <FileText size={18} color="#DC2626" weight="regular" />
               <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: 0 }}>Recent Bills</h3>
             </div>
-            <button style={{ background: 'none', border: 'none', color: '#0284C7', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Link href="/finance/purchase-invoices" style={{ textDecoration: 'none', color: '#0284C7', fontSize: '12.5px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>View all</span>
               <ArrowUpRight size={14} weight="bold" />
-            </button>
+            </Link>
           </div>
 
           {/* Bills Table */}
@@ -850,10 +853,18 @@ export default function FinanceOverviewPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-              <button onClick={() => setSelectedRecord(null)} style={{ padding: '8px 18px', borderRadius: '6px', border: 'none', background: '#0F172A', color: '#FFFFFF', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              <button onClick={() => setSelectedRecord(null)} style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFFFFF', color: '#475569', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                 Close
               </button>
+              <Link
+                href={selectedRecord.type === 'Invoice' ? `/finance/sales-invoices` : `/finance/purchase-invoices/${selectedRecord.id}`}
+                onClick={() => setSelectedRecord(null)}
+                style={{ padding: '8px 18px', borderRadius: '6px', border: 'none', background: '#0F766E', color: '#FFFFFF', fontSize: '13px', fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <span>View Full Detail</span>
+                <ArrowUpRight size={14} weight="bold" />
+              </Link>
             </div>
           </div>
         </div>
