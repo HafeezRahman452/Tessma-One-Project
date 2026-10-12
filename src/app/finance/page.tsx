@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Plus,
   Coins,
@@ -385,6 +386,7 @@ export default function FinanceOverviewPage() {
               </div>
             </div>
 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {[
                 { label: 'Customers', href: '/finance/customers', icon: <User size={15} color="#2563EB" /> },
                 { label: 'Sales invoices', href: '/finance/sales-invoices', icon: <FileText size={15} color="#059669" /> },

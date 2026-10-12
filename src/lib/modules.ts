@@ -38,6 +38,9 @@ export const ALL_MODULES: ModuleDefinition[] = [
       { name: 'Customers', href: '/finance/customers' },
       { name: 'Suppliers', href: '/finance/suppliers' },
       { name: 'Payments', href: '/finance/payments' },
+      { name: 'General ledger', href: '/finance/general-ledger' },
+      { name: 'Reports', href: '/finance/reports' },
+      { name: 'Settings', href: '/finance/settings' },
     ]
   },
   {
