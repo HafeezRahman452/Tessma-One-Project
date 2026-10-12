@@ -1,3 +1,10 @@
+export interface SubItemDefinition {
+  name: string;
+  href: string;
+  badge?: string;
+  children?: { name: string; href: string; badge?: string }[];
+}
+
 export interface ModuleDefinition {
   id: string;
   name: string;
@@ -6,7 +13,7 @@ export interface ModuleDefinition {
   description: string;
   category: 'core' | 'operations' | 'management' | 'system';
   badge?: string;
-  subItems?: { name: string; href: string; badge?: string }[];
+  subItems?: SubItemDefinition[];
 }
 
 export const ALL_MODULES: ModuleDefinition[] = [
@@ -38,7 +45,19 @@ export const ALL_MODULES: ModuleDefinition[] = [
       { name: 'Customers', href: '/finance/customers' },
       { name: 'Suppliers', href: '/finance/suppliers' },
       { name: 'Payments', href: '/finance/payments' },
-      { name: 'General ledger', href: '/finance/general-ledger' },
+      {
+        name: 'Ledger',
+        href: '/finance/ledger/trial-balance',
+        children: [
+          { name: 'Chart of accounts', href: '/finance/general-ledger' },
+          { name: 'Financial periods', href: '/finance/general-ledger' },
+          { name: 'Journals', href: '/finance/general-ledger' },
+          { name: 'General ledger', href: '/finance/general-ledger' },
+          { name: 'Trial balance', href: '/finance/ledger/trial-balance' },
+        ],
+      },
+      { name: 'Banking', href: '/finance/payments' },
+      { name: 'VAT & Tax', href: '/finance/reports' },
       { name: 'Reports', href: '/finance/reports' },
       { name: 'Settings', href: '/finance/settings' },
     ]

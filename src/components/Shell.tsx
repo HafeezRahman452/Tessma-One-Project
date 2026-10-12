@@ -50,6 +50,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     dashboard: true,
     finance: true,
   });
+  const [expandedSubGroups, setExpandedSubGroups] = useState<Record<string, boolean>>({
+    'Ledger': true,
+  });
   const [showSubModal, setShowSubModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -97,7 +100,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       } else if (parts.length >= 2) {
         const section = parts[0];
         const subFormatted = section.charAt(0).toUpperCase() + section.slice(1).replace(/-/g, ' ');
-        const detailName = decodeURIComponent(parts[1]).replace(/-/g, ' ');
+        const rawDetail = decodeURIComponent(parts[1]).replace(/-/g, ' ');
+        const detailName = rawDetail.charAt(0).toUpperCase() + rawDetail.slice(1);
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
             <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
@@ -322,6 +326,77 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     }}
                   >
                     {mod.subItems.map((sub) => {
+                      if (sub.children && sub.children.length > 0) {
+                        const isGroupExpanded = expandedSubGroups[sub.name] ?? true;
+                        const isAnyChildActive = sub.children.some((c) => pathname === c.href || pathname.startsWith(c.href));
+
+                        return (
+                          <div key={sub.name} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <div
+                              onClick={() =>
+                                setExpandedSubGroups((prev) => ({
+                                  ...prev,
+                                  [sub.name]: !isGroupExpanded,
+                                }))
+                              }
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '6px 10px',
+                                borderRadius: '4px',
+                                fontSize: '12.5px',
+                                color: isAnyChildActive ? '#FFFFFF' : 'var(--color-nav-text-muted)',
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                              }}
+                            >
+                              <span>{sub.name}</span>
+                              <span style={{ display: 'flex', alignItems: 'center', color: 'var(--color-nav-text-muted)' }}>
+                                {isGroupExpanded ? <CaretDown size={11} weight="bold" /> : <CaretRight size={11} weight="bold" />}
+                              </span>
+                            </div>
+
+                            {isGroupExpanded && (
+                              <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '12px', gap: '2px' }}>
+                                {sub.children.map((child) => {
+                                  const isChildActive = pathname === child.href;
+                                  return (
+                                    <Link
+                                      key={child.name}
+                                      href={child.href}
+                                      style={{
+                                        padding: '5px 10px',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        color: isChildActive ? '#FFFFFF' : 'var(--color-nav-text-muted)',
+                                        fontWeight: isChildActive ? 600 : 400,
+                                        background: isChildActive ? '#007D7D' : 'transparent',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '7px',
+                                        textDecoration: 'none',
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          width: '4px',
+                                          height: '4px',
+                                          borderRadius: '50%',
+                                          background: isChildActive ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                                        }}
+                                      />
+                                      <span>{child.name}</span>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
                       const isSubActive =
                         (sub.href === '/' && (pathname === '/' || pathname === '/dashboard')) ||
                         (sub.href !== '/' && pathname === sub.href);
