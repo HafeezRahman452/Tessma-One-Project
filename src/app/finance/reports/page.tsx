@@ -19,7 +19,7 @@ import {
   ChartBar,
   Percent,
   CheckCircle,
-  FileSpreadsheet,
+  FileXls,
   FilePdf,
   DotsThreeVertical,
   Play,
@@ -183,7 +183,7 @@ export default function FinanceReportsPage() {
             { id: 'my', label: 'My reports', icon: <ChartBar size={15} weight="bold" /> },
             { id: 'scheduled', label: 'Scheduled reports', icon: <Clock size={15} weight="bold" /> },
             { id: 'recent', label: 'Recently exported', icon: <DownloadSimple size={15} weight="bold" /> },
-            { id: 'templates', label: 'Report templates', icon: <FileSpreadsheet size={15} weight="bold" /> },
+            { id: 'templates', label: 'Report templates', icon: <FileXls size={15} weight="bold" /> },
           ].map((tab) => {
             const active = activeTab === tab.id;
             return (
@@ -1059,7 +1059,7 @@ export default function FinanceReportsPage() {
                 <div key={exp.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #F8FAFC' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {exp.type === 'excel' ? (
-                      <FileSpreadsheet size={16} color="#16A34A" weight="fill" />
+                      <FileXls size={16} color="#16A34A" weight="fill" />
                     ) : (
                       <FilePdf size={16} color="#DC2626" weight="fill" />
                     )}
