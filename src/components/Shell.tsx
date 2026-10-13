@@ -96,6 +96,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
       );
     }
+    if (pathname === '/finance/branding') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+          <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <Link href="/finance/branding" style={{ color: '#64748B', textDecoration: 'none' }}>Branding &amp; Company Identity</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#0B1220', fontWeight: 600 }}>Invoice Template Designer / Configuration</span>
+        </div>
+      );
+    }
     if (pathname.startsWith('/finance/')) {
       const parts = pathname.replace('/finance/', '').split('/').filter(Boolean);
       if (parts.length === 1) {

@@ -59,6 +59,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
         ],
       },
       { name: 'Reports', href: '/finance/reports' },
+      { name: 'Branding & Company Identity', href: '/finance/branding' },
       { name: 'Settings', href: '/finance/settings' },
     ]
   },
