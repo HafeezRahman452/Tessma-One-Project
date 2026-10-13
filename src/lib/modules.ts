@@ -45,6 +45,8 @@ export const ALL_MODULES: ModuleDefinition[] = [
       { name: 'Customers', href: '/finance/customers' },
       { name: 'Suppliers', href: '/finance/suppliers' },
       { name: 'Payments', href: '/finance/payments' },
+      { name: 'VAT', href: '/finance/vat' },
+      { name: 'Banking', href: '/finance/payments' },
       {
         name: 'Ledger',
         href: '/finance/ledger/trial-balance',
@@ -56,8 +58,6 @@ export const ALL_MODULES: ModuleDefinition[] = [
           { name: 'Trial balance', href: '/finance/ledger/trial-balance' },
         ],
       },
-      { name: 'Banking', href: '/finance/payments' },
-      { name: 'VAT & Tax', href: '/finance/reports' },
       { name: 'Reports', href: '/finance/reports' },
       { name: 'Settings', href: '/finance/settings' },
     ]

@@ -85,6 +85,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
       );
     }
+    if (pathname === '/finance/vat' || pathname === '/finance/vat/vat-return') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+          <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <Link href="/finance/vat" style={{ color: '#64748B', textDecoration: 'none' }}>VAT</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#0B1220', fontWeight: 600 }}>VAT return</span>
+        </div>
+      );
+    }
     if (pathname.startsWith('/finance/')) {
       const parts = pathname.replace('/finance/', '').split('/').filter(Boolean);
       if (parts.length === 1) {
@@ -399,7 +410,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
                       const isSubActive =
                         (sub.href === '/' && (pathname === '/' || pathname === '/dashboard')) ||
-                        (sub.href !== '/' && pathname === sub.href);
+                        (sub.href !== '/' && (pathname === sub.href || (sub.href !== '/finance' && pathname.startsWith(sub.href + '/'))));
 
                       return (
                         <Link
