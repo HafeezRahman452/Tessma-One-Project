@@ -46,7 +46,16 @@ export const ALL_MODULES: ModuleDefinition[] = [
       { name: 'Suppliers', href: '/finance/suppliers' },
       { name: 'Payments', href: '/finance/payments' },
       { name: 'VAT', href: '/finance/vat' },
-      { name: 'Banking', href: '/finance/payments' },
+      {
+        name: 'Banking',
+        href: '/finance/banking/bank-accounts',
+        children: [
+          { name: 'Bank accounts', href: '/finance/banking/bank-accounts' },
+          { name: 'Bank transactions', href: '/finance/payments' },
+          { name: 'Reconciliations', href: '/finance/payments' },
+          { name: 'Cash flow forecast', href: '/finance/payments' },
+        ],
+      },
       {
         name: 'Ledger',
         href: '/finance/ledger/trial-balance',
