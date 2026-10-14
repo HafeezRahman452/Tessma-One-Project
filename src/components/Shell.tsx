@@ -140,6 +140,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
       );
     }
+    if (pathname === '/finance/banking/reconciliations') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+          <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <Link href="/finance/banking/bank-accounts" style={{ color: '#64748B', textDecoration: 'none' }}>Banking</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#0B1220', fontWeight: 600 }}>Bank reconciliation</span>
+        </div>
+      );
+    }
     if (pathname.startsWith('/finance/')) {
       const parts = pathname.replace('/finance/', '').split('/').filter(Boolean);
       if (parts.length === 1) {

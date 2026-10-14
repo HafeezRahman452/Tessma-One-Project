@@ -52,7 +52,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
         children: [
           { name: 'Bank accounts', href: '/finance/banking/bank-accounts' },
           { name: 'Bank transactions', href: '/finance/payments' },
-          { name: 'Reconciliations', href: '/finance/payments' },
+          { name: 'Reconciliations', href: '/finance/banking/reconciliations' },
           { name: 'Cash flow forecast', href: '/finance/payments' },
         ],
       },
