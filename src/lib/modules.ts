@@ -72,7 +72,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
         name: 'Branding & Company Identity',
         href: '/finance/branding',
         children: [
-          { name: 'Template Designer', href: '/finance/branding' },
+          { name: 'Invoice Template', href: '/finance/branding' },
           { name: 'Invoice Library', href: '/finance/branding/template-library' },
         ],
       },
