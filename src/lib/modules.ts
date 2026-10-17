@@ -74,6 +74,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
         children: [
           { name: 'Invoice Template', href: '/finance/branding' },
           { name: 'Invoice Library', href: '/finance/branding/template-library' },
+          { name: 'Invoice Selection', href: '/finance/branding/invoice-selection' },
         ],
       },
       { name: 'Settings', href: '/finance/settings' },
