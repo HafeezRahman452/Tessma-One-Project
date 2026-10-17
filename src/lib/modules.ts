@@ -75,6 +75,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
           { name: 'Invoice Template', href: '/finance/branding' },
           { name: 'Invoice Library', href: '/finance/branding/template-library' },
           { name: 'Invoice Selection', href: '/finance/branding/invoice-selection' },
+          { name: 'Invoice Preview', href: '/finance/branding/invoice-preview' },
         ],
       },
       { name: 'Settings', href: '/finance/settings' },

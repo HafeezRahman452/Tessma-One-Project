@@ -140,6 +140,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </div>
       );
     }
+    if (pathname === '/finance/branding/invoice-preview') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+          <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <Link href="/finance/branding" style={{ color: '#64748B', textDecoration: 'none' }}>Branding &amp; Company Identity</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#0B1220', fontWeight: 600 }}>Invoice Template Preview</span>
+        </div>
+      );
+    }
     if (pathname === '/finance/banking/bank-accounts') {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
