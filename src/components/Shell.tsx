@@ -18,6 +18,7 @@ import {
   Gear,
   CaretRight,
   CaretDown,
+  CaretLeft,
   Sparkle,
   MagnifyingGlass,
   Bell,
@@ -55,6 +56,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   });
   const [showSubModal, setShowSubModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -216,7 +218,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       {/* FULL HEIGHT FIXED SIDEBAR */}
       <aside
         style={{
-          width: 'var(--sidebar-width)',
+          width: isSidebarOpen ? 'var(--sidebar-width)' : '72px',
+          transition: 'all 0.25s ease',
           backgroundColor: 'var(--color-nav-bg)',
           color: 'var(--color-nav-text)',
           display: 'flex',
@@ -263,30 +266,80 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <div style={{ width: '6px', height: '6px', background: '#FFFFFF', borderRadius: '1.5px' }} />
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {isSidebarOpen && (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  lineHeight: 1.1,
+                }}
+              >
+                TESSMA
+              </span>
+              <span
+                style={{
+                  color: '#009A96',
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  letterSpacing: '0.16em',
+                  marginTop: '1px',
+                }}
+              >
+                ONE
+              </span>
+            </div>
+          )}
+        </div>
+
+                {/* MENU Label with Arrow Toggle Button */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isSidebarOpen ? 'space-between' : 'center',
+            padding: isSidebarOpen ? '14px 18px 6px 18px' : '14px 8px 6px 8px',
+            flexShrink: 0,
+          }}
+        >
+          {isSidebarOpen && (
             <span
               style={{
-                color: '#FFFFFF',
-                fontSize: '15px',
+                fontSize: '11px',
                 fontWeight: 700,
+                color: 'var(--color-nav-text-muted)',
                 letterSpacing: '0.08em',
-                lineHeight: 1.1,
+                textTransform: 'uppercase',
               }}
             >
-              TESSMA
+              MENU
             </span>
-            <span
-              style={{
-                color: '#009A96',
-                fontSize: '10px',
-                fontWeight: 600,
-                letterSpacing: '0.16em',
-                marginTop: '1px',
-              }}
-            >
-              ONE
-            </span>
-          </div>
+          )}
+          <button
+            onClick={() => setIsSidebarOpen((prev) => !prev)}
+            title={isSidebarOpen ? 'Close Menu' : 'Open Menu'}
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              backgroundColor: '#009A96',
+              border: 'none',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(0, 154, 150, 0.4)',
+              transition: 'transform 0.15s ease',
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+          >
+            {isSidebarOpen ? <CaretLeft size={13} weight="bold" /> : <CaretRight size={13} weight="bold" />}
+          </button>
         </div>
 
         {/* Scrollable Navigation List covering full middle */}
@@ -333,7 +386,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     <span style={{ display: 'flex', alignItems: 'center' }}>
                       {PHOSPHOR_ICONS[mod.icon] || <SquaresFour size={18} />}
                     </span>
-                    <span>{mod.name}</span>
+                    {isSidebarOpen && <span style={{ whiteSpace: "nowrap" }}>{mod.name}</span>}
                   </div>
                   <LockSimple size={13} color="var(--color-nav-text-muted)" />
                 </div>
@@ -383,10 +436,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     >
                       {PHOSPHOR_ICONS[mod.icon] || <SquaresFour size={18} />}
                     </span>
-                    <span>{mod.name}</span>
+                    {isSidebarOpen && <span style={{ whiteSpace: "nowrap" }}>{mod.name}</span>}
                   </div>
 
-                  {mod.subItems && mod.subItems.length > 0 && (
+                  {isSidebarOpen && mod.subItems && mod.subItems.length > 0 && (
                     <span
                       onClick={(e) => toggleExpand(mod.id, e)}
                       style={{
@@ -402,7 +455,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 </Link>
 
                 {/* Sub items dropdown */}
-                {mod.subItems && isExpanded && (
+                {isSidebarOpen && mod.subItems && isExpanded && (
                   <div
                     style={{
                       display: 'flex',
@@ -554,12 +607,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             >
               JD
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#E6EBF4', lineHeight: 1.2 }}>
-                John Doe
-              </span>
-              <span style={{ fontSize: '11px', color: 'var(--color-nav-text-muted)' }}>Managing Director</span>
-            </div>
+            {isSidebarOpen && (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#E6EBF4', lineHeight: 1.2 }}>
+                  John Doe
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--color-nav-text-muted)' }}>Managing Director</span>
+              </div>
+            )}
           </div>
           <button
             onClick={() => setShowSubModal(true)}
@@ -585,8 +640,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           flexDirection: 'column',
           minWidth: 0,
           minHeight: '100vh',
-          marginLeft: 'var(--sidebar-width)',
-          width: 'calc(100vw - var(--sidebar-width))',
+          marginLeft: isSidebarOpen ? 'var(--sidebar-width)' : '72px',
+          width: isSidebarOpen ? 'calc(100vw - var(--sidebar-width))' : 'calc(100vw - 72px)',
+          transition: 'all 0.25s ease',
         }}
       >
         {/* TOP HEADER */}
