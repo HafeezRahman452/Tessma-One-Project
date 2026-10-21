@@ -411,14 +411,14 @@ export default function InvoicePreviewPage() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#f8fafc', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100%', fontFamily: 'Inter, sans-serif', overflow: 'hidden' }}>
 
       {/* ── Main content ──────────────────────────────────────────────────── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
 
         {/* Page header */}
-        <div style={{ padding: '18px 24px 12px', flexShrink: 0 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Invoice Template Preview</h1>
+        <div style={{ padding: '0 0 16px 0', flexShrink: 0 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Invoice Template Preview</h1>
           <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>
             See how this template will look with your branding. Review the design, features and configuration details before using it.
           </p>
@@ -426,7 +426,7 @@ export default function InvoicePreviewPage() {
 
         {/* PDF-style toolbar */}
         <div style={{
-          margin: '0 24px', background: '#1e293b', borderRadius: '8px 8px 0 0',
+          margin: '0', background: '#1e293b', borderRadius: '8px 8px 0 0',
           display: 'flex', alignItems: 'center', padding: '0 12px', height: 40, gap: 2, flexShrink: 0
         }}>
           <button style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 15, padding: '0 6px' }}>☰</button>
@@ -461,14 +461,14 @@ export default function InvoicePreviewPage() {
         </div>
 
         {/* Dark invoice viewer */}
-        <div style={{ margin: '0 24px', background: '#2d3748', flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '24px 16px', overflowX: 'auto', height: 390 }}>
+        <div style={{ margin: '0', background: '#2d3748', flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '24px 16px', overflowX: 'auto', height: 390 }}>
           <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.2s' }}>
             <FullInvoice tpl={activeTpl} customColours={customColours} />
           </div>
         </div>
 
         {/* ── Related templates ─────────────────────────────────────── */}
-        <div style={{ margin: '0 24px', background: '#fff', border: '1px solid #e2e8f0', borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '14px 18px', flexShrink: 0 }}>
+        <div style={{ margin: '0', background: '#fff', border: '1px solid #e2e8f0', borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '14px 18px', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 20, height: 20, background: '#dcfce7', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

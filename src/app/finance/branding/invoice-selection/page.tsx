@@ -155,9 +155,9 @@ export default function InvoiceSelectionPage() {
   const selected = serviceTemplates.find(t => t.id === selectedId) || serviceTemplates[0];
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#f8fafc', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ display: 'flex', height: '100%', fontFamily: 'Inter, sans-serif' }}>
       {/* ── Main content ─────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 24px 40px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 24px 40px 0' }}>
 
         {/* Title */}
         <h1 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>Invoice Template Selection</h1>

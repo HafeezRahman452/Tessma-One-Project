@@ -106,10 +106,10 @@ export default function NewSalesInvoicePage() {
   ];
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '24px 32px 60px', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '40px', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       
       {/* ── Top Header Actions: Cancel, Save as draft, Review & issue ─────────── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', margin: '0 0 6px 0' }}>New sales invoice</h1>
           <p style={{ fontSize: 13.5, color: '#64748b', margin: 0 }}>
