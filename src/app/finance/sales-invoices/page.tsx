@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import {
   FileText,
   PaperPlaneTilt,
@@ -516,8 +517,8 @@ export default function SalesInvoicesListPage() {
             </button>
 
             {/* + New Invoice Button */}
-            <button
-              onClick={() => setShowNewInvoiceModal(true)}
+            <Link
+              href="/finance/sales-invoices/new"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -532,11 +533,12 @@ export default function SalesInvoicesListPage() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 boxShadow: '0 1px 3px rgba(0, 125, 125, 0.3)',
+                textDecoration: 'none',
               }}
             >
               <Plus size={15} weight="bold" />
               <span>New invoice</span>
-            </button>
+            </Link>
 
             {/* Export Dropdown */}
             <button
