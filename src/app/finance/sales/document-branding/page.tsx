@@ -93,6 +93,98 @@ export default function DocumentBrandingPage() {
   // Zoom level for document viewer
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showFullPreviewModal, setShowFullPreviewModal] = useState(false);
+  const [showToast, setShowToast] = useState<string | null>(null);
+
+  // Load saved branding from localStorage on initial load
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('tessma_document_branding');
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.companyName !== undefined) setCompanyName(data.companyName);
+        if (data.tradingName !== undefined) setTradingName(data.tradingName);
+        if (data.showTradingName !== undefined) setShowTradingName(data.showTradingName);
+        if (data.customLogo !== undefined) setCustomLogo(data.customLogo);
+        if (data.primaryColour !== undefined) setPrimaryColour(data.primaryColour);
+        if (data.secondaryColour !== undefined) setSecondaryColour(data.secondaryColour);
+        if (data.accentColour !== undefined) setAccentColour(data.accentColour);
+        if (data.headerLayout !== undefined) setHeaderLayout(data.headerLayout);
+        if (data.documentFont !== undefined) setDocumentFont(data.documentFont);
+        if (data.addressLine1 !== undefined) setAddressLine1(data.addressLine1);
+        if (data.addressLine2 !== undefined) setAddressLine2(data.addressLine2);
+        if (data.townCity !== undefined) setTownCity(data.townCity);
+        if (data.postcode !== undefined) setPostcode(data.postcode);
+        if (data.country !== undefined) setCountry(data.country);
+        if (data.phone !== undefined) setPhone(data.phone);
+        if (data.email !== undefined) setEmail(data.email);
+        if (data.website !== undefined) setWebsite(data.website);
+        if (data.bankName !== undefined) setBankName(data.bankName);
+        if (data.sortCode !== undefined) setSortCode(data.sortCode);
+        if (data.accountNumber !== undefined) setAccountNumber(data.accountNumber);
+        if (data.accountName !== undefined) setAccountName(data.accountName);
+        if (data.iban !== undefined) setIban(data.iban);
+        if (data.regCompanyName !== undefined) setRegCompanyName(data.regCompanyName);
+        if (data.companyRegNumber !== undefined) setCompanyRegNumber(data.companyRegNumber);
+        if (data.vatNumber !== undefined) setVatNumber(data.vatNumber);
+        if (data.defaultSignoff !== undefined) setDefaultSignoff(data.defaultSignoff);
+        if (data.defaultTemplate !== undefined) setDefaultTemplate(data.defaultTemplate);
+        if (data.invoiceTemplate !== undefined) setInvoiceTemplate(data.invoiceTemplate);
+        if (data.creditNoteTemplate !== undefined) setCreditNoteTemplate(data.creditNoteTemplate);
+        if (data.statementTemplate !== undefined) setStatementTemplate(data.statementTemplate);
+        if (data.includePaymentInstructions !== undefined) setIncludePaymentInstructions(data.includePaymentInstructions);
+      }
+    } catch (err) {
+      console.error('Error loading branding:', err);
+    }
+  }, []);
+
+  // Save branding function
+  const handleSaveBranding = (isPublish = false) => {
+    try {
+      const dataToSave = {
+        companyName,
+        tradingName,
+        showTradingName,
+        customLogo,
+        primaryColour,
+        secondaryColour,
+        accentColour,
+        headerLayout,
+        documentFont,
+        addressLine1,
+        addressLine2,
+        townCity,
+        postcode,
+        country,
+        phone,
+        email,
+        website,
+        bankName,
+        sortCode,
+        accountNumber,
+        accountName,
+        iban,
+        regCompanyName,
+        companyRegNumber,
+        vatNumber,
+        defaultSignoff,
+        defaultTemplate,
+        invoiceTemplate,
+        creditNoteTemplate,
+        statementTemplate,
+        includePaymentInstructions,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem('tessma_document_branding', JSON.stringify(dataToSave));
+      setShowToast(isPublish ? '✓ Branding published and saved successfully!' : '✓ Draft saved successfully!');
+      setTimeout(() => setShowToast(null), 3000);
+    } catch (err) {
+      console.error('Error saving branding:', err);
+      setShowToast('Error saving branding to storage');
+      setTimeout(() => setShowToast(null), 3000);
+    }
+  };
+
 
   // Logo file upload handler
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +201,30 @@ export default function DocumentBrandingPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '40px', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       
+      
+      {/* Toast Notification */}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          bottom: 28,
+          right: 28,
+          background: '#0F172A',
+          color: '#FFFFFF',
+          padding: '12px 20px',
+          borderRadius: 8,
+          fontSize: 13,
+          fontWeight: 600,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          zIndex: 10000,
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <span>{showToast}</span>
+        </div>
+      )}
+
       {/* ── Top Header Title & Actions ────────────────────────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
@@ -122,6 +238,8 @@ export default function DocumentBrandingPage() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button
+            type="button"
+            onClick={() => handleSaveBranding(false)}
             style={{
               background: '#ffffff',
               border: '1px solid #e2e8f0',
@@ -131,7 +249,8 @@ export default function DocumentBrandingPage() {
               fontWeight: 600,
               color: '#334155',
               cursor: 'pointer',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+              transition: 'all 0.15s ease'
             }}
           >
             Save draft
@@ -157,6 +276,8 @@ export default function DocumentBrandingPage() {
             <Eye size={15} /> Preview
           </button>
           <button
+            type="button"
+            onClick={() => handleSaveBranding(true)}
             style={{
               background: '#007D7D',
               border: 'none',
@@ -169,7 +290,8 @@ export default function DocumentBrandingPage() {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              boxShadow: '0 1px 3px rgba(0, 125, 125, 0.3)'
+              boxShadow: '0 1px 3px rgba(0, 125, 125, 0.3)',
+              transition: 'all 0.15s ease'
             }}
           >
             <FileCheck size={15} /> Publish branding
