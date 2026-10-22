@@ -69,6 +69,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   // Determine current breadcrumbs based on route
   const getBreadcrumb = () => {
+    if (pathname === '/dashboard/needs-attention') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+          <span>Dashboard</span>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#0B1220', fontWeight: 600 }}>Needs Attention</span>
+        </div>
+      );
+    }
     if (pathname === '/dashboard/tasks' || pathname === '/dashboard/my-work') {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
@@ -1053,4 +1062,5 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
 

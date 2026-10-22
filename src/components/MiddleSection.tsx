@@ -248,7 +248,7 @@ export default function MiddleSection({ isSubscribed }: MiddleSectionProps) {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link href="/dashboard/needs-attention" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', cursor: 'pointer' }}>
             <Warning size={16} color="#EF4444" weight="fill" />
             <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>
               Needs Attention
@@ -265,9 +265,9 @@ export default function MiddleSection({ isSubscribed }: MiddleSectionProps) {
             >
               8
             </span>
-          </div>
+          </Link>
           <Link
-            href="/"
+            href="/dashboard/needs-attention"
             style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '11.5px', color: 'var(--color-text-secondary)', fontWeight: 500 }}
           >
             <span>View All</span>
