@@ -267,7 +267,7 @@ export default function DocumentBrandingPage() {
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '6px 10px', fontSize: 12, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                      style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}
                     />
                   </div>
 
@@ -279,7 +279,7 @@ export default function DocumentBrandingPage() {
                       type="text"
                       value={tradingName}
                       onChange={(e) => setTradingName(e.target.value)}
-                      style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '6px 10px', fontSize: 12, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                      style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}
                     />
                   </div>
 
@@ -461,10 +461,7 @@ export default function DocumentBrandingPage() {
                   <select
                     value={documentFont}
                     onChange={(e) => setDocumentFont(e.target.value)}
-                    style={{
-                      width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '7px 26px 7px 10px',
-                      fontSize: 12, color: '#0f172a', background: '#fff', appearance: 'none', cursor: 'pointer', outline: 'none'
-                    }}
+                    style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 30px 8px 12px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', appearance: 'none', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}
                   >
                     <option value="Inter (Recommended)">Inter (Recommended)</option>
                     <option value="Roboto">Roboto</option>
@@ -510,15 +507,15 @@ export default function DocumentBrandingPage() {
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>
                       Address line 1 <span style={{ color: '#ef4444' }}>*</span>
                     </label>
-                    <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Address line 2</label>
-                    <input type="text" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Town / City <span style={{ color: '#ef4444' }}>*</span></label>
-                    <input type="text" value={townCity} onChange={(e) => setTownCity(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={townCity} onChange={(e) => setTownCity(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                 </div>
 
@@ -526,12 +523,12 @@ export default function DocumentBrandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1.2fr', gap: 8 }}>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Postcode <span style={{ color: '#ef4444' }}>*</span></label>
-                    <input type="text" value={postcode} onChange={(e) => setPostcode(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={postcode} onChange={(e) => setPostcode(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Country <span style={{ color: '#ef4444' }}>*</span></label>
                     <div style={{ position: 'relative' }}>
-                      <select value={country} onChange={(e) => setCountry(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 22px 5px 8px', fontSize: 11.5, color: '#0f172a', background: '#fff', appearance: 'none', outline: 'none' }}>
+                      <select value={country} onChange={(e) => setCountry(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 30px 8px 12px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', appearance: 'none', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
                         <option>United Kingdom</option>
                         <option>United States</option>
                         <option>Ireland</option>
@@ -541,7 +538,7 @@ export default function DocumentBrandingPage() {
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Phone</label>
-                    <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                 </div>
 
@@ -549,11 +546,11 @@ export default function DocumentBrandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Email</label>
-                    <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Website</label>
-                    <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                 </div>
               </div>
@@ -574,15 +571,15 @@ export default function DocumentBrandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gap: 8 }}>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Bank name</label>
-                    <input type="text" value={bankName} onChange={(e) => setBankName(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={bankName} onChange={(e) => setBankName(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Sort code</label>
-                    <input type="text" value={sortCode} onChange={(e) => setSortCode(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={sortCode} onChange={(e) => setSortCode(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Account number</label>
-                    <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                 </div>
 
@@ -590,11 +587,11 @@ export default function DocumentBrandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 8 }}>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Account name</label>
-                    <input type="text" value={accountName} onChange={(e) => setAccountName(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={accountName} onChange={(e) => setAccountName(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>IBAN (optional)</label>
-                    <input type="text" value={iban} onChange={(e) => setIban(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={iban} onChange={(e) => setIban(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                 </div>
               </div>
@@ -866,16 +863,16 @@ export default function DocumentBrandingPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Registered company name</label>
-                  <input type="text" value={regCompanyName} onChange={(e) => setRegCompanyName(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                  <input type="text" value={regCompanyName} onChange={(e) => setRegCompanyName(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Company reg. number</label>
-                    <input type="text" value={companyRegNumber} onChange={(e) => setCompanyRegNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={companyRegNumber} onChange={(e) => setCompanyRegNumber(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>VAT registration number</label>
-                    <input type="text" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                    <input type="text" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', color: '#0F172A', outline: 'none', background: '#FFFFFF', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }} />
                   </div>
                 </div>
               </div>
@@ -919,13 +916,13 @@ export default function DocumentBrandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                   <div>
                     <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Default template</label>
-                    <select value={defaultTemplate} onChange={(e) => setDefaultTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                    <select value={defaultTemplate} onChange={(e) => setDefaultTemplate(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 30px 8px 12px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', appearance: 'none', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
                       <option>TESSMA Standard (Current)</option>
                     </select>
                   </div>
                   <div>
                     <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Invoice template</label>
-                    <select value={invoiceTemplate} onChange={(e) => setInvoiceTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                    <select value={invoiceTemplate} onChange={(e) => setInvoiceTemplate(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 30px 8px 12px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', appearance: 'none', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
                       <option>TESSMA Standard</option>
                     </select>
                   </div>
@@ -934,13 +931,13 @@ export default function DocumentBrandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                   <div>
                     <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Credit note template</label>
-                    <select value={creditNoteTemplate} onChange={(e) => setCreditNoteTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                    <select value={creditNoteTemplate} onChange={(e) => setCreditNoteTemplate(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 30px 8px 12px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', appearance: 'none', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
                       <option>TESSMA Standard</option>
                     </select>
                   </div>
                   <div>
                     <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Statement template</label>
-                    <select value={statementTemplate} onChange={(e) => setStatementTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                    <select value={statementTemplate} onChange={(e) => setStatementTemplate(e.target.value)} style={{ width: '100%', height: '38px', border: '1.5px solid #E2E8F0', borderRadius: '8px', padding: '8px 30px 8px 12px', fontSize: '13px', color: '#0F172A', background: '#FFFFFF', appearance: 'none', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
                       <option>TESSMA Statement</option>
                     </select>
                   </div>
