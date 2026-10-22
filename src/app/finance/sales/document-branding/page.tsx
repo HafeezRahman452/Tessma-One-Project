@@ -92,6 +92,7 @@ export default function DocumentBrandingPage() {
 
   // Zoom level for document viewer
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [showFullPreviewModal, setShowFullPreviewModal] = useState(false);
 
   // Logo file upload handler
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,6 +137,8 @@ export default function DocumentBrandingPage() {
             Save draft
           </button>
           <button
+            type="button"
+            onClick={() => setShowFullPreviewModal(true)}
             style={{
               background: '#ffffff',
               border: '1px solid #e2e8f0',
@@ -599,120 +602,7 @@ export default function DocumentBrandingPage() {
 
           </div>
 
-          {/* Row 4: Legal & registration details + Email signature defaults + Document defaults */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 16 }}>
-            
-            {/* Legal & registration details */}
-            <div style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                <div style={{ width: 22, height: 22, borderRadius: 5, background: '#e6fffa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ShieldCheck size={13} />
-                </div>
-                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>Legal &amp; registration details</h3>
-              </div>
-              <p style={{ fontSize: 10.5, color: '#64748b', margin: '0 0 12px 30px' }}>These details may be shown in your document footer.</p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Registered company name</label>
-                  <input type="text" value={regCompanyName} onChange={(e) => setRegCompanyName(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                  <div>
-                    <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Company reg. number</label>
-                    <input type="text" value={companyRegNumber} onChange={(e) => setCompanyRegNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>VAT registration number</label>
-                    <input type="text" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Email signature defaults */}
-            <div style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                <div style={{ width: 22, height: 22, borderRadius: 5, background: '#e6fffa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Mail size={13} />
-                </div>
-                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>Email signature defaults</h3>
-              </div>
-              <p style={{ fontSize: 10.5, color: '#64748b', margin: '0 0 12px 30px' }}>Used when sending invoices, credit notes and statements.</p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>Default sign-off</span>
-                  <input type="text" value={defaultSignoff} onChange={(e) => setDefaultSignoff(e.target.value)} style={{ width: '100px', border: '1px solid #e2e8f0', borderRadius: 6, padding: '3px 6px', fontSize: 11, color: '#0f172a', outline: 'none' }} />
-                </div>
-                <div style={{ background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: 6, padding: '8px 10px', fontSize: 10, color: '#64748b', lineHeight: 1.4 }}>
-                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{signName}</div>
-                  <div>{signTitle}</div>
-                  <div>{companyName}</div>
-                  <div style={{ color: '#007D7D' }}>{phone} | {website}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Document defaults */}
-            <div style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                <div style={{ width: 22, height: 22, borderRadius: 5, background: '#e6fffa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <FileCode size={13} />
-                </div>
-                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>Document defaults</h3>
-              </div>
-              <p style={{ fontSize: 10.5, color: '#64748b', margin: '0 0 12px 30px' }}>Choose the default template and settings for each document type.</p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                  <div>
-                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Default template</label>
-                    <select value={defaultTemplate} onChange={(e) => setDefaultTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
-                      <option>TESSMA Standard (Current)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Invoice template</label>
-                    <select value={invoiceTemplate} onChange={(e) => setInvoiceTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
-                      <option>TESSMA Standard</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                  <div>
-                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Credit note template</label>
-                    <select value={creditNoteTemplate} onChange={(e) => setCreditNoteTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
-                      <option>TESSMA Standard</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Statement template</label>
-                    <select value={statementTemplate} onChange={(e) => setStatementTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
-                      <option>TESSMA Statement</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                  <input
-                    type="checkbox"
-                    id="inclPay"
-                    checked={includePaymentInstructions}
-                    onChange={(e) => setIncludePaymentInstructions(e.target.checked)}
-                    style={{ accentColor: '#007D7D' }}
-                  />
-                  <label htmlFor="inclPay" style={{ fontSize: 10.5, color: '#334155' }}>
-                    Include payment instructions by default
-                  </label>
-                </div>
-              </div>
-            </div>
-
           </div>
-
-        </div>
 
         {/* ── RIGHT COLUMN: LIVE DOCUMENT PREVIEW ──────────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -768,7 +658,7 @@ export default function DocumentBrandingPage() {
                 <span>1 / 1</span>
                 <span style={{ cursor: 'pointer' }} onClick={() => setZoomLevel(z => Math.max(70, z - 10))}>−</span>
                 <span style={{ cursor: 'pointer' }} onClick={() => setZoomLevel(z => Math.min(130, z + 10))}>+</span>
-                <Maximize2 size={11} style={{ cursor: 'pointer' }} />
+                <Maximize2 size={11} style={{ cursor: 'pointer' }} onClick={() => setShowFullPreviewModal(true)} title="Full page preview" />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Download size={13} style={{ cursor: 'pointer' }} />
@@ -957,6 +847,344 @@ export default function DocumentBrandingPage() {
         </div>
 
       </div>
+
+      {/* ── FULL WIDTH BOTTOM SECTION: 3 CARDS (Legal, Email Signature, Document Defaults) ── */}
+      <div style={{ marginTop: 10 }}>
+        {/* Row 4: Legal & registration details + Email signature defaults + Document defaults */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 16 }}>
+            
+            {/* Legal & registration details */}
+            <div style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                <div style={{ width: 22, height: 22, borderRadius: 5, background: '#e6fffa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ShieldCheck size={13} />
+                </div>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>Legal &amp; registration details</h3>
+              </div>
+              <p style={{ fontSize: 10.5, color: '#64748b', margin: '0 0 12px 30px' }}>These details may be shown in your document footer.</p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Registered company name</label>
+                  <input type="text" value={regCompanyName} onChange={(e) => setRegCompanyName(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>Company reg. number</label>
+                    <input type="text" value={companyRegNumber} onChange={(e) => setCompanyRegNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, fontWeight: 600, color: '#334155', display: 'block', marginBottom: 3 }}>VAT registration number</label>
+                    <input type="text" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 6, padding: '5px 8px', fontSize: 11.5, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Email signature defaults */}
+            <div style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                <div style={{ width: 22, height: 22, borderRadius: 5, background: '#e6fffa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Mail size={13} />
+                </div>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>Email signature defaults</h3>
+              </div>
+              <p style={{ fontSize: 10.5, color: '#64748b', margin: '0 0 12px 30px' }}>Used when sending invoices, credit notes and statements.</p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>Default sign-off</span>
+                  <input type="text" value={defaultSignoff} onChange={(e) => setDefaultSignoff(e.target.value)} style={{ width: '100px', border: '1px solid #e2e8f0', borderRadius: 6, padding: '3px 6px', fontSize: 11, color: '#0f172a', outline: 'none' }} />
+                </div>
+                <div style={{ background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: 6, padding: '8px 10px', fontSize: 10, color: '#64748b', lineHeight: 1.4 }}>
+                  <div style={{ fontWeight: 700, color: '#0f172a' }}>{signName}</div>
+                  <div>{signTitle}</div>
+                  <div>{companyName}</div>
+                  <div style={{ color: '#007D7D' }}>{phone} | {website}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Document defaults */}
+            <div style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                <div style={{ width: 22, height: 22, borderRadius: 5, background: '#e6fffa', color: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <FileCode size={13} />
+                </div>
+                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>Document defaults</h3>
+              </div>
+              <p style={{ fontSize: 10.5, color: '#64748b', margin: '0 0 12px 30px' }}>Choose the default template and settings for each document type.</p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Default template</label>
+                    <select value={defaultTemplate} onChange={(e) => setDefaultTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                      <option>TESSMA Standard (Current)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Invoice template</label>
+                    <select value={invoiceTemplate} onChange={(e) => setInvoiceTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                      <option>TESSMA Standard</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Credit note template</label>
+                    <select value={creditNoteTemplate} onChange={(e) => setCreditNoteTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                      <option>TESSMA Standard</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, fontWeight: 600, color: '#64748b' }}>Statement template</label>
+                    <select value={statementTemplate} onChange={(e) => setStatementTemplate(e.target.value)} style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 4, padding: '3px 4px', fontSize: 10, background: '#fff', outline: 'none' }}>
+                      <option>TESSMA Statement</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                  <input
+                    type="checkbox"
+                    id="inclPay"
+                    checked={includePaymentInstructions}
+                    onChange={(e) => setIncludePaymentInstructions(e.target.checked)}
+                    style={{ accentColor: '#007D7D' }}
+                  />
+                  <label htmlFor="inclPay" style={{ fontSize: 10.5, color: '#334155' }}>
+                    Include payment instructions by default
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+      </div>
+
+    
+      {/* ── FULL PAGE INVOICE PREVIEW MODAL ───────────────────────── */}
+      {showFullPreviewModal && (
+        <div
+          onClick={() => setShowFullPreviewModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 24
+          }}
+        >
+          {/* Modal Header Controls */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '650px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 12,
+              color: '#ffffff'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 16, fontWeight: 700 }}>Full Document Preview – {activePreviewDoc}</span>
+              <span style={{ background: '#007D7D', color: '#fff', fontSize: 11, padding: '2px 8px', borderRadius: 4, fontWeight: 600 }}>
+                {documentFont}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button
+                onClick={() => window.print()}
+                style={{ background: '#334155', border: 'none', borderRadius: 6, padding: '6px 12px', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <Printer size={14} /> Print
+              </button>
+              <button
+                onClick={() => setShowFullPreviewModal(false)}
+                style={{ background: '#ef4444', border: 'none', borderRadius: 6, padding: '6px 12px', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <X size={14} /> Close
+              </button>
+            </div>
+          </div>
+
+          {/* Modal Document Body */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#ffffff',
+              width: '100%',
+              maxWidth: '650px',
+              maxHeight: '88vh',
+              overflowY: 'auto',
+              borderRadius: 8,
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+              padding: '36px 32px',
+              fontFamily: getSelectedFontFamily(),
+              color: '#334155',
+              fontSize: 11
+            }}
+          >
+            {/* Header */}
+            <div style={{
+              display: 'flex',
+              justifyContent: headerLayout === 'centre' ? 'center' : 'space-between',
+              alignItems: 'flex-start',
+              flexDirection: headerLayout === 'right' ? 'row-reverse' : 'row',
+              borderBottom: `3px solid ${primaryColour}`,
+              paddingBottom: 16,
+              marginBottom: 18
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                {customLogo ? (
+                  <img src={customLogo} alt="Invoice Logo" style={{ maxHeight: '48px', maxWidth: '160px', objectFit: 'contain' }} />
+                ) : (
+                  <>
+                    <div style={{ width: 38, height: 38, background: primaryColour, clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15, fontWeight: 900 }}>
+                      T
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 900, color: '#0f172a', letterSpacing: 0.5 }}>{tradingName || 'TESSMA'}</div>
+                      <div style={{ fontSize: 9, color: accentColour, fontWeight: 700 }}>ONE</div>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', letterSpacing: 2 }}>{activePreviewDoc.toUpperCase()}</div>
+              </div>
+            </div>
+
+            {/* Address & Meta */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, marginBottom: 18, fontSize: 10.5 }}>
+              <div>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 12, marginBottom: 4 }}>{companyName}</div>
+                <div style={{ color: '#64748b', lineHeight: 1.5 }}>
+                  {addressLine1}<br />
+                  {addressLine2}<br />
+                  {townCity} {postcode}<br />
+                  {country}<br />
+                  VAT No: {vatNumber}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <div><span style={{ color: '#64748b' }}>Invoice No:</span> <span style={{ fontWeight: 700, color: '#0f172a' }}>INV-2025-0423</span></div>
+                <div><span style={{ color: '#64748b' }}>Issue Date:</span> <span style={{ fontWeight: 600 }}>15 Apr 2025</span></div>
+                <div><span style={{ color: '#64748b' }}>Due Date:</span> <span style={{ fontWeight: 600 }}>15 May 2025</span></div>
+                <div><span style={{ color: '#64748b' }}>Service Period:</span> <span style={{ fontWeight: 600 }}>01 Apr 2025 – 30 Apr 2025</span></div>
+                <div><span style={{ color: '#64748b' }}>Reference:</span> <span style={{ fontWeight: 600 }}>PO-44881</span></div>
+              </div>
+            </div>
+
+            {/* Bill To & Contact */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, background: '#f8fafc', padding: '12px 14px', borderRadius: 6, marginBottom: 18, fontSize: 10 }}>
+              <div>
+                <div style={{ fontWeight: 700, color: primaryColour, textTransform: 'uppercase', marginBottom: 4 }}>Bill To:</div>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 11 }}>ABC Ltd</div>
+                <div style={{ color: '#64748b', lineHeight: 1.4 }}>
+                  123 Business Park<br />Innovation Drive<br />London SW1 1AA<br />VAT No: GB987654321
+                </div>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, color: primaryColour, textTransform: 'uppercase', marginBottom: 4 }}>Contact:</div>
+                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: 11 }}>Sarah Clarke</div>
+                <div style={{ color: '#64748b', lineHeight: 1.4 }}>
+                  Finance Manager<br />sarah.clarke@abc-ltd.co.uk<br />+44 20 7123 4567
+                </div>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{
+                display: 'grid', gridTemplateColumns: '2fr 0.4fr 0.8fr 0.5fr 1fr',
+                background: primaryColour, color: '#ffffff', padding: '8px 12px',
+                fontWeight: 700, fontSize: 10.5, borderRadius: '4px 4px 0 0'
+              }}>
+                <span>Description</span>
+                <span style={{ textAlign: 'right' }}>Qty</span>
+                <span style={{ textAlign: 'right' }}>Unit Price</span>
+                <span style={{ textAlign: 'right' }}>VAT</span>
+                <span style={{ textAlign: 'right' }}>Amount (GBP)</span>
+              </div>
+
+              {[
+                { desc: 'Website Design', qty: 1, price: '£4,500.00', vat: '20%', amt: '£4,500.00' },
+                { desc: 'Website Development', qty: 20, price: '£120.00', vat: '20%', amt: '£2,400.00' },
+                { desc: 'Project Management', qty: 10, price: '£75.00', vat: '20%', amt: '£750.00' },
+                { desc: 'Consultancy Services', qty: 8, price: '£150.00', vat: '20%', amt: '£1,200.00' },
+              ].map((row, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'grid', gridTemplateColumns: '2fr 0.4fr 0.8fr 0.5fr 1fr',
+                    padding: '8px 12px', fontSize: 10.5, borderBottom: '1px solid #f1f5f9',
+                    background: i % 2 === 0 ? '#ffffff' : '#f8fafc'
+                  }}
+                >
+                  <span style={{ fontWeight: 600, color: '#0f172a' }}>{row.desc}</span>
+                  <span style={{ textAlign: 'right', color: '#64748b' }}>{row.qty}</span>
+                  <span style={{ textAlign: 'right', color: '#64748b' }}>{row.price}</span>
+                  <span style={{ textAlign: 'right', color: '#64748b' }}>{row.vat}</span>
+                  <span style={{ textAlign: 'right', fontWeight: 600, color: '#0f172a' }}>{row.amt}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Totals */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, marginBottom: 18, fontSize: 10.5 }}>
+              <div style={{ display: 'flex', gap: 24 }}>
+                <span style={{ color: '#64748b' }}>Subtotal</span>
+                <span style={{ fontWeight: 600, minWidth: 80, textAlign: 'right' }}>£8,850.00</span>
+              </div>
+              <div style={{ display: 'flex', gap: 24 }}>
+                <span style={{ color: '#64748b' }}>VAT (20%)</span>
+                <span style={{ fontWeight: 600, minWidth: 80, textAlign: 'right' }}>£1,770.00</span>
+              </div>
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', width: '100%',
+                background: '#f0fdfa', border: `1px solid ${accentColour}50`,
+                padding: '8px 12px', borderRadius: 6, marginTop: 6, fontWeight: 800, fontSize: 13
+              }}>
+                <span style={{ color: primaryColour }}>Total (GBP)</span>
+                <span style={{ color: '#0f172a' }}>£10,620.00</span>
+              </div>
+            </div>
+
+            {/* Payment & Footer */}
+            {includePaymentInstructions && (
+              <div style={{
+                borderTop: '1px solid #e2e8f0', paddingTop: 14,
+                display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16, fontSize: 9.5, color: '#64748b'
+              }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: primaryColour, textTransform: 'uppercase', marginBottom: 4 }}>Payment Details</div>
+                  <div>Bank: {bankName}</div>
+                  <div>Sort Code: {sortCode}</div>
+                  <div>Account No: {accountNumber}</div>
+                  <div>Account Name: {accountName}</div>
+                  <div>IBAN: {iban}</div>
+                </div>
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                  <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: 3 }}>Thank you for your business.</div>
+                  <div>If you have any questions, please contact</div>
+                  <div>us at {email}</div>
+                  <div>or {phone}.</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );
