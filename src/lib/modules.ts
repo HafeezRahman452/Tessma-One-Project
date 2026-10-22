@@ -26,7 +26,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
     category: 'core',
     subItems: [
       { name: 'Overview', href: '/' },
-      { name: 'My tasks', href: '/dashboard/tasks' },
+      { name: 'My Work', href: '/dashboard/tasks' },
       { name: 'Approvals', href: '/dashboard/approvals' },
     ]
   },
@@ -230,3 +230,4 @@ export const INITIAL_SUBSCRIBED_MODULES = [
   'reports',
   'settings'
 ];
+
