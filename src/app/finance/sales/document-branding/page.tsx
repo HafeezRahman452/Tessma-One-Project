@@ -777,7 +777,7 @@ export default function DocumentBrandingPage() {
                 <span>1 / 1</span>
                 <span style={{ cursor: 'pointer' }} onClick={() => setZoomLevel(z => Math.max(70, z - 10))}>−</span>
                 <span style={{ cursor: 'pointer' }} onClick={() => setZoomLevel(z => Math.min(130, z + 10))}>+</span>
-                <Maximize2 size={11} style={{ cursor: 'pointer' }} onClick={() => setShowFullPreviewModal(true)} title="Full page preview" />
+                <span title="Full page preview" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowFullPreviewModal(true)}><Maximize2 size={11} /></span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Download size={13} style={{ cursor: 'pointer' }} />

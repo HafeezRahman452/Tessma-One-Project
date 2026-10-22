@@ -69,6 +69,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   // Determine current breadcrumbs based on route
   const getBreadcrumb = () => {
+    if (pathname === '/finance/ledger/chart-of-accounts') {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>
+          <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#64748B' }}>Ledger</span>
+          <span style={{ color: '#94A3B8' }}>&gt;</span>
+          <span style={{ color: '#0B1220', fontWeight: 600 }}>Chart of accounts</span>
+        </div>
+      );
+    }
     if (pathname === '/dashboard/needs-attention') {
       return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B' }}>

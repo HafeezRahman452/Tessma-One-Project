@@ -67,7 +67,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
         name: 'Ledger',
         href: '/finance/ledger/trial-balance',
         children: [
-          { name: 'Chart of accounts', href: '/finance/general-ledger' },
+          { name: 'Chart of accounts', href: '/finance/ledger/chart-of-accounts' },
           { name: 'Financial periods', href: '/finance/general-ledger' },
           { name: 'Journals', href: '/finance/general-ledger' },
           { name: 'General ledger', href: '/finance/general-ledger' },
@@ -231,5 +231,6 @@ export const INITIAL_SUBSCRIBED_MODULES = [
   'reports',
   'settings'
 ];
+
 
 
