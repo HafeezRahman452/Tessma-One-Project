@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Building2,
   Palette,
@@ -32,6 +32,8 @@ export default function DocumentBrandingPage() {
   const [companyName, setCompanyName] = useState('Your Company Ltd');
   const [tradingName, setTradingName] = useState('TESSMA ONE');
   const [showTradingName, setShowTradingName] = useState(true);
+  const [customLogo, setCustomLogo] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Brand colours state
   const [primaryColour, setPrimaryColour] = useState('#0F766E');
@@ -43,6 +45,16 @@ export default function DocumentBrandingPage() {
 
   // Typography
   const [documentFont, setDocumentFont] = useState('Inter (Recommended)');
+
+  // Dynamic CSS font-family mapper
+  const getSelectedFontFamily = () => {
+    if (documentFont.startsWith('Roboto')) return 'Roboto, -apple-system, sans-serif';
+    if (documentFont.startsWith('Open Sans')) return '"Open Sans", -apple-system, sans-serif';
+    if (documentFont.startsWith('Lato')) return 'Lato, -apple-system, sans-serif';
+    if (documentFont.startsWith('Georgia')) return 'Georgia, serif';
+    if (documentFont.startsWith('Courier')) return '"Courier New", monospace';
+    return 'Inter, -apple-system, sans-serif';
+  };
 
   // Company & contact details
   const [addressLine1, setAddressLine1] = useState('123 Business Park');
@@ -80,6 +92,18 @@ export default function DocumentBrandingPage() {
 
   // Zoom level for document viewer
   const [zoomLevel, setZoomLevel] = useState(100);
+
+  // Logo file upload handler
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        setCustomLogo(evt.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '40px', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -173,31 +197,59 @@ export default function DocumentBrandingPage() {
                 {/* Logo Box */}
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#475569', marginBottom: 4 }}>Company logo</div>
+                  
+                  {/* Hidden native file input */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleLogoUpload}
+                  />
+
                   <div style={{
                     border: '1px solid #e2e8f0', borderRadius: 8, padding: '12px 10px',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     background: '#f8fafc', position: 'relative', minHeight: '80px'
                   }}>
-                    <button style={{ position: 'absolute', top: 5, right: 5, background: '#94a3b8', border: 'none', borderRadius: '50%', width: 14, height: 14, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}>
-                      <X size={10} />
-                    </button>
-                    {/* Logo SVG */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 26, height: 26, background: '#0F766E', clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 900 }}>
-                        T
+                    {customLogo && (
+                      <button
+                        type="button"
+                        onClick={() => setCustomLogo(null)}
+                        title="Remove uploaded logo"
+                        style={{ position: 'absolute', top: 5, right: 5, background: '#94a3b8', border: 'none', borderRadius: '50%', width: 16, height: 16, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}
+                      >
+                        <X size={11} />
+                      </button>
+                    )}
+
+                    {customLogo ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={customLogo} alt="Uploaded logo" style={{ maxWidth: '100%', maxHeight: '55px', objectFit: 'contain' }} />
+                    ) : (
+                      /* Default Logo SVG */
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ width: 26, height: 26, background: primaryColour, clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 900 }}>
+                          T
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: 11, fontWeight: 800, color: '#0f172a', lineHeight: 1.1 }}>{tradingName || 'TESSMA'}</span>
+                          <span style={{ fontSize: 8, color: accentColour, fontWeight: 700 }}>ONE</span>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: '#0f172a', lineHeight: 1.1 }}>TESSMA</span>
-                        <span style={{ fontSize: 8, color: '#0d9488', fontWeight: 700 }}>ONE</span>
-                      </div>
-                    </div>
+                    )}
                   </div>
+
                   <div style={{ fontSize: 9.5, color: '#94a3b8', marginTop: 4 }}>Recommended: 300 x 100px, PNG or SVG</div>
-                  <button style={{
-                    marginTop: 6, width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 6,
-                    padding: '5px 8px', fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
-                  }}>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      marginTop: 6, width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 6,
+                      padding: '5px 8px', fontSize: 11, fontWeight: 600, color: '#334155', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
+                    }}
+                  >
                     <Upload size={12} /> Change logo
                   </button>
                 </div>
@@ -411,18 +463,24 @@ export default function DocumentBrandingPage() {
                       fontSize: 12, color: '#0f172a', background: '#fff', appearance: 'none', cursor: 'pointer', outline: 'none'
                     }}
                   >
-                    <option>Inter (Recommended)</option>
-                    <option>Roboto</option>
-                    <option>Open Sans</option>
-                    <option>Lato</option>
+                    <option value="Inter (Recommended)">Inter (Recommended)</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Georgia">Georgia (Serif)</option>
+                    <option value="Courier">Courier (Monospace)</option>
                   </select>
                   <ChevronDown size={14} color="#64748b" style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                 </div>
 
-                {/* Font sample box */}
+                {/* Font sample box with live dynamic font-family */}
                 <div style={{ background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: 6, padding: '8px 12px' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', letterSpacing: 0.5 }}>AaBbCcDd123</div>
-                  <div style={{ fontSize: 10.5, color: '#64748b', marginTop: 2 }}>The quick brown fox jumps over the lazy dog.</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', letterSpacing: 0.5, fontFamily: getSelectedFontFamily() }}>
+                    AaBbCcDd123
+                  </div>
+                  <div style={{ fontSize: 10.5, color: '#64748b', marginTop: 2, fontFamily: getSelectedFontFamily() }}>
+                    The quick brown fox jumps over the lazy dog.
+                  </div>
                 </div>
               </div>
             </div>
@@ -732,6 +790,7 @@ export default function DocumentBrandingPage() {
                 flexDirection: 'column',
                 fontSize: 8.5,
                 color: '#334155',
+                fontFamily: getSelectedFontFamily(),
                 transform: `scale(${zoomLevel / 100})`,
                 transformOrigin: 'top center',
                 transition: 'transform 0.15s ease'
@@ -749,13 +808,20 @@ export default function DocumentBrandingPage() {
                 }}>
                   {/* Logo + Brand */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 28, height: 28, background: primaryColour, clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 900 }}>
-                      T
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 900, color: '#0f172a', letterSpacing: 0.5 }}>{tradingName || 'TESSMA'}</div>
-                      <div style={{ fontSize: 7, color: accentColour, fontWeight: 700 }}>ONE</div>
-                    </div>
+                    {customLogo ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={customLogo} alt="Invoice Logo" style={{ maxHeight: '34px', maxWidth: '120px', objectFit: 'contain' }} />
+                    ) : (
+                      <>
+                        <div style={{ width: 28, height: 28, background: primaryColour, clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 900 }}>
+                          T
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 900, color: '#0f172a', letterSpacing: 0.5 }}>{tradingName || 'TESSMA'}</div>
+                          <div style={{ fontSize: 7, color: accentColour, fontWeight: 700 }}>ONE</div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Document Type Title */}
@@ -877,8 +943,8 @@ export default function DocumentBrandingPage() {
                     <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                       <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>Thank you for your business.</div>
                       <div>If you have any questions, please contact</div>
-                      <div>us at accounts@yourcompany.co.uk</div>
-                      <div>or +44 20 7123 4567.</div>
+                      <div>us at {email}</div>
+                      <div>or {phone}.</div>
                     </div>
                   </div>
                 )}
