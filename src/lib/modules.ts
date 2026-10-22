@@ -39,11 +39,17 @@ export const ALL_MODULES: ModuleDefinition[] = [
     category: 'operations',
     subItems: [
       { name: 'Overview', href: '/finance' },
-      { name: 'Sales invoices', href: '/finance/sales-invoices' },
-      { name: 'Purchase invoices', href: '/finance/purchase-invoices' },
-      { name: 'Credit notes', href: '/finance/credit-notes' },
-      { name: 'Customers', href: '/finance/customers' },
-      { name: 'Suppliers', href: '/finance/suppliers' },
+      {
+        name: 'Sales',
+        href: '/finance/sales-invoices',
+        children: [
+          { name: 'Invoices', href: '/finance/sales-invoices' },
+          { name: 'Credit notes', href: '/finance/credit-notes' },
+          { name: 'Customers', href: '/finance/customers' },
+          { name: 'Suppliers', href: '/finance/suppliers' },
+          { name: 'Document branding', href: '/finance/sales/document-branding' },
+        ],
+      },
       { name: 'Payments', href: '/finance/payments' },
       { name: 'VAT', href: '/finance/vat' },
       {
