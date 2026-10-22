@@ -994,8 +994,8 @@ export default function MyWorkPage() {
                   <span
                     style={{
                       fontSize: '12.5px',
-                      color: task.completed ? '#94A3B8' : '#1E293B',
-                      textDecoration: task.completed ? 'line-through' : 'none',
+                      color: '#1E293B',
+                      textDecoration: 'none',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -1698,3 +1698,4 @@ export default function MyWorkPage() {
     </div>
   );
 }
+
