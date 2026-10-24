@@ -1,8 +1,15 @@
+export interface MenuChildDefinition {
+  name: string;
+  href?: string; // omitted = heading only (page not created yet)
+  badge?: string;
+  children?: MenuChildDefinition[];
+}
+
 export interface SubItemDefinition {
   name: string;
-  href: string;
+  href?: string; // omitted = heading only (page not created yet)
   badge?: string;
-  children?: { name: string; href: string; badge?: string }[];
+  children?: MenuChildDefinition[];
 }
 
 export interface ModuleDefinition {
@@ -40,52 +47,134 @@ export const ALL_MODULES: ModuleDefinition[] = [
     category: 'operations',
     subItems: [
       { name: 'Overview', href: '/finance' },
+      { name: 'Customers', href: '/finance/customers' },
       {
-        name: 'Sales',
-        href: '/finance/sales-invoices',
+        name: 'Invoices',
         children: [
-          { name: 'Invoices', href: '/finance/sales-invoices' },
-          { name: 'Credit notes', href: '/finance/credit-notes' },
-          { name: 'Customers', href: '/finance/customers' },
-          { name: 'Suppliers', href: '/finance/suppliers' },
-          { name: 'Document branding', href: '/finance/sales/document-branding' },
+          { name: 'Sales Invoices', href: '/finance/sales-invoices' },
+          { name: 'Credit Notes', href: '/finance/credit-notes' },
+          { name: 'Receipts' },
+          { name: 'Receivables Ageing' },
+          { name: 'Customer Statements' },
         ],
       },
-      { name: 'Payments', href: '/finance/payments' },
-      { name: 'VAT', href: '/finance/vat' },
+      {
+        name: 'Suppliers',
+        children: [
+          { name: 'Supplier List', href: '/finance/suppliers' },
+          { name: 'Supplier Bills', href: '/finance/purchase-invoices' },
+          { name: 'Supplier Credit Notes' },
+          { name: 'Supplier Payments' },
+          { name: 'Payables Ageing' },
+        ],
+      },
       {
         name: 'Banking',
-        href: '/finance/banking/bank-accounts',
         children: [
-          { name: 'Bank accounts', href: '/finance/banking/bank-accounts' },
-          { name: 'Bank transactions', href: '/finance/payments' },
-          { name: 'Reconciliations', href: '/finance/banking/reconciliations' },
-          { name: 'Cash flow forecast', href: '/finance/payments' },
+          { name: 'Bank Accounts', href: '/finance/banking/bank-accounts' },
+          { name: 'Bank Transactions' },
+          { name: 'Bank Reconciliation', href: '/finance/banking/reconciliations' },
+          { name: 'Reconciliation History' },
         ],
       },
       {
-        name: 'Ledger',
-        href: '/finance/ledger/trial-balance',
+        name: 'Payments & Receipts',
         children: [
-          { name: 'Chart of accounts', href: '/finance/ledger/chart-of-accounts' },
-          { name: 'Financial periods', href: '/finance/general-ledger' },
-          { name: 'Journals', href: '/finance/general-ledger' },
-          { name: 'General ledger', href: '/finance/general-ledger' },
-          { name: 'Trial balance', href: '/finance/ledger/trial-balance' },
+          { name: 'All Transactions', href: '/finance/payments' },
+          { name: 'Customer Receipts' },
+          { name: 'Supplier Payments' },
+          { name: 'Transfers' },
+          { name: 'Refunds' },
+          { name: 'Unallocated Transactions' },
         ],
       },
-      { name: 'Reports', href: '/finance/reports' },
       {
-        name: 'Branding & Company Identity',
-        href: '/finance/branding',
+        name: 'Accounting',
         children: [
-          { name: 'Invoice Template', href: '/finance/branding' },
-          { name: 'Invoice Library', href: '/finance/branding/template-library' },
-          { name: 'Invoice Selection', href: '/finance/branding/invoice-selection' },
-          { name: 'Invoice Preview', href: '/finance/branding/invoice-preview' },
+          { name: 'Chart of Accounts', href: '/finance/ledger/chart-of-accounts' },
+          { name: 'Journals' },
+          { name: 'General Ledger', href: '/finance/general-ledger' },
+          { name: 'Trial Balance', href: '/finance/ledger/trial-balance' },
+          { name: 'Accounting Periods' },
         ],
       },
-      { name: 'Settings', href: '/finance/settings' },
+      {
+        name: 'VAT & Tax',
+        children: [
+          { name: 'VAT Overview', href: '/finance/vat' },
+          { name: 'VAT Returns', href: '/finance/vat/vat-return' },
+          { name: 'VAT Transactions' },
+          { name: 'VAT Return History' },
+        ],
+      },
+      {
+        name: 'Reports',
+        children: [
+          { name: 'Reports Home', href: '/finance/reports' },
+          {
+            name: 'Financial Statements',
+            children: [
+              { name: 'Profit & Loss' },
+              { name: 'Balance Sheet' },
+              { name: 'Cash Flow' },
+            ],
+          },
+          {
+            name: 'Accounting Reports',
+            children: [
+              { name: 'Trial Balance', href: '/finance/ledger/trial-balance' },
+              { name: 'General Ledger', href: '/finance/general-ledger' },
+            ],
+          },
+          {
+            name: 'Receivables Reports',
+            children: [
+              { name: 'Receivables Ageing' },
+              { name: 'Outstanding Invoices' },
+              { name: 'Customer Balances' },
+            ],
+          },
+          {
+            name: 'Payables Reports',
+            children: [
+              { name: 'Payables Ageing' },
+              { name: 'Outstanding Bills' },
+              { name: 'Supplier Balances' },
+            ],
+          },
+          { name: 'VAT Reports' },
+        ],
+      },
+      {
+        name: 'Finance Templates',
+        children: [
+          { name: 'Invoice Templates', href: '/finance/branding/template-library' },
+          { name: 'Credit Note Templates' },
+          { name: 'Customer Statement Templates' },
+          { name: 'Supplier Document Templates' },
+        ],
+      },
+      {
+        name: 'Finance Settings',
+        children: [
+          { name: 'General', href: '/finance/settings' },
+          { name: 'Financial Year & Periods' },
+          { name: 'Accounting Defaults' },
+          { name: 'Chart of Accounts Settings' },
+          { name: 'Tax & VAT' },
+          { name: 'Currencies & Exchange Rates' },
+          { name: 'Payment Terms' },
+          { name: 'Invoice Numbering' },
+          { name: 'Credit Note Numbering' },
+          { name: 'Supplier Bill Settings' },
+          { name: 'Bank Details' },
+          { name: 'Customer Defaults' },
+          { name: 'Supplier Defaults' },
+          { name: 'Approval Rules' },
+          { name: 'Document Defaults' },
+          { name: 'Period Locking' },
+        ],
+      },
     ]
   },
   {

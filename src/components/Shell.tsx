@@ -26,7 +26,7 @@ import {
   LockSimple,
   X
 } from '@phosphor-icons/react';
-import { ALL_MODULES } from '@/lib/modules';
+import { ALL_MODULES, type MenuChildDefinition } from '@/lib/modules';
 import { useSubscription } from '@/lib/SubscriptionContext';
 
 const PHOSPHOR_ICONS: Record<string, React.ReactNode> = {
@@ -65,6 +65,121 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  // ---- Sidebar menu helpers (nested groups + heading-only items) ----
+  const isMenuNodeActive = (node: MenuChildDefinition): boolean => {
+    if (node.href && (pathname === node.href || pathname.startsWith(node.href + '/'))) return true;
+    return (node.children || []).some(isMenuNodeActive);
+  };
+
+  // Menu item whose page is not created yet: show the heading only (not clickable)
+  const renderHeadingOnly = (key: string, name: string, fontSize: string, padding: string, gap: string) => (
+    <div
+      key={key}
+      title="Coming soon"
+      style={{
+        padding,
+        borderRadius: '6px',
+        fontSize,
+        color: 'var(--color-nav-text-muted)',
+        fontWeight: 400,
+        background: 'transparent',
+        display: 'flex',
+        alignItems: 'center',
+        gap,
+        cursor: 'default',
+        userSelect: 'none',
+      }}
+    >
+      <span
+        style={{
+          width: '4px',
+          height: '4px',
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.3)',
+        }}
+      />
+      <span>{name}</span>
+    </div>
+  );
+
+  const renderMenuGroup = (group: MenuChildDefinition, groupKey: string, modId: string, depth: number): React.ReactNode => {
+    const isAnyChildActive = isMenuNodeActive(group);
+    const isGroupExpanded = expandedSubGroups[groupKey] ?? (modId === 'finance' ? isAnyChildActive : true);
+
+    return (
+      <div key={groupKey} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div
+          onClick={() =>
+            setExpandedSubGroups((prev) => ({
+              ...prev,
+              [groupKey]: !isGroupExpanded,
+            }))
+          }
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: depth === 0 ? '6px 10px' : '5px 10px',
+            borderRadius: '4px',
+            fontSize: depth === 0 ? '12.5px' : '12px',
+            color: isAnyChildActive ? '#FFFFFF' : 'var(--color-nav-text-muted)',
+            fontWeight: 500,
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          <span>{group.name}</span>
+          <span style={{ display: 'flex', alignItems: 'center', color: 'var(--color-nav-text-muted)' }}>
+            {isGroupExpanded ? <CaretDown size={11} weight="bold" /> : <CaretRight size={11} weight="bold" />}
+          </span>
+        </div>
+
+        {isGroupExpanded && (
+          <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '12px', gap: '2px' }}>
+            {(group.children || []).map((child) => {
+              const childKey = groupKey + '/' + child.name;
+              if (child.children && child.children.length > 0) {
+                return renderMenuGroup(child, childKey, modId, depth + 1);
+              }
+              if (!child.href) {
+                return renderHeadingOnly(childKey, child.name, '12px', '5px 10px', '7px');
+              }
+              const isChildActive = pathname === child.href;
+              return (
+                <Link
+                  key={childKey}
+                  href={child.href}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    color: isChildActive ? '#FFFFFF' : 'var(--color-nav-text-muted)',
+                    fontWeight: isChildActive ? 600 : 400,
+                    background: isChildActive ? '#007D7D' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span
+                    style={{
+                      width: '4px',
+                      height: '4px',
+                      borderRadius: '50%',
+                      background: isChildActive ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                    }}
+                  />
+                  <span>{child.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Determine current breadcrumbs based on route
@@ -528,84 +643,21 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                   >
                     {mod.subItems.map((sub) => {
                       if (sub.children && sub.children.length > 0) {
-                        const isGroupExpanded = expandedSubGroups[sub.name] ?? true;
-                        const isAnyChildActive = sub.children.some((c) => pathname === c.href || pathname.startsWith(c.href));
-
-                        return (
-                          <div key={sub.name} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <div
-                              onClick={() =>
-                                setExpandedSubGroups((prev) => ({
-                                  ...prev,
-                                  [sub.name]: !isGroupExpanded,
-                                }))
-                              }
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                padding: '6px 10px',
-                                borderRadius: '4px',
-                                fontSize: '12.5px',
-                                color: isAnyChildActive ? '#FFFFFF' : 'var(--color-nav-text-muted)',
-                                fontWeight: 500,
-                                cursor: 'pointer',
-                                userSelect: 'none',
-                              }}
-                            >
-                              <span>{sub.name}</span>
-                              <span style={{ display: 'flex', alignItems: 'center', color: 'var(--color-nav-text-muted)' }}>
-                                {isGroupExpanded ? <CaretDown size={11} weight="bold" /> : <CaretRight size={11} weight="bold" />}
-                              </span>
-                            </div>
-
-                            {isGroupExpanded && (
-                              <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '12px', gap: '2px' }}>
-                                {sub.children.map((child) => {
-                                  const isChildActive = pathname === child.href;
-                                  return (
-                                    <Link
-                                      key={child.name}
-                                      href={child.href}
-                                      style={{
-                                        padding: '5px 10px',
-                                        borderRadius: '6px',
-                                        fontSize: '12px',
-                                        color: isChildActive ? '#FFFFFF' : 'var(--color-nav-text-muted)',
-                                        fontWeight: isChildActive ? 600 : 400,
-                                        background: isChildActive ? '#007D7D' : 'transparent',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '7px',
-                                        textDecoration: 'none',
-                                      }}
-                                    >
-                                      <span
-                                        style={{
-                                          width: '4px',
-                                          height: '4px',
-                                          borderRadius: '50%',
-                                          background: isChildActive ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
-                                        }}
-                                      />
-                                      <span>{child.name}</span>
-                                    </Link>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
+                        return renderMenuGroup(sub, sub.name, mod.id, 0);
                       }
 
+                      if (!sub.href) {
+                        return renderHeadingOnly(sub.name, sub.name, '12.5px', '6px 10px', '8px');
+                      }
+                      const subHref = sub.href;
                       const isSubActive =
-                        (sub.href === '/' && (pathname === '/' || pathname === '/dashboard')) ||
-                        (sub.href !== '/' && (pathname === sub.href || (sub.href !== '/finance' && pathname.startsWith(sub.href + '/'))));
+                        (subHref === '/' && (pathname === '/' || pathname === '/dashboard')) ||
+                        (subHref !== '/' && (pathname === subHref || (subHref !== '/finance' && pathname.startsWith(subHref + '/'))));
 
                       return (
                         <Link
                           key={sub.name}
-                          href={sub.href}
+                          href={subHref}
                           style={{
                             padding: '6px 10px',
                             borderRadius: '4px',
