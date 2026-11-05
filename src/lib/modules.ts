@@ -178,6 +178,21 @@ export const ALL_MODULES: ModuleDefinition[] = [
     ]
   },
   {
+    id: 'designs',
+    name: 'Designs',
+    icon: 'Palette',
+    href: '/designs',
+    description: 'Template designer, company identity, document branding and invoice styling.',
+    category: 'operations',
+    subItems: [
+      { name: 'Template Library', href: '/finance/branding/template-library' },
+      { name: 'Invoice Designer', href: '/finance/branding' },
+      { name: 'Template Selection', href: '/finance/branding/invoice-selection' },
+      { name: 'Template Preview', href: '/finance/branding/template-preview' },
+      { name: 'Sales Document Branding', href: '/finance/sales/document-branding' },
+    ]
+  },
+  {
     id: 'sales-crm',
     name: 'Sales & CRM',
     icon: 'ChartLineUp',
@@ -309,6 +324,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
 export const INITIAL_SUBSCRIBED_MODULES = [
   'dashboard',
   'finance',
+  'designs',
   'sales-crm',
   'projects',
   'hr',
@@ -320,6 +336,7 @@ export const INITIAL_SUBSCRIBED_MODULES = [
   'reports',
   'settings'
 ];
+
 
 
 

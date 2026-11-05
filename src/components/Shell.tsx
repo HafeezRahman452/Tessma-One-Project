@@ -16,6 +16,7 @@ import {
   Headset,
   ChartBar,
   Gear,
+  Palette,
   CaretRight,
   CaretDown,
   CaretLeft,
@@ -42,6 +43,7 @@ const PHOSPHOR_ICONS: Record<string, React.ReactNode> = {
   Headset: <Headset size={18} weight="regular" />,
   ChartBar: <ChartBar size={18} weight="regular" />,
   Gear: <Gear size={18} weight="regular" />,
+  Palette: <Palette size={18} weight="regular" />,
 };
 
 export default function Shell({ children }: { children: React.ReactNode }) {
