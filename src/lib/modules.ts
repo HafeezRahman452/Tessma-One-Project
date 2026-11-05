@@ -186,6 +186,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
     category: 'operations',
     subItems: [
       { name: 'Customer Detail', href: '/designs/customer-detail' },
+      { name: 'Credit Note Template Library', href: '/designs/credit-note-templates' },
       { name: 'Template Library', href: '/finance/branding/template-library' },
       { name: 'Invoice Designer', href: '/finance/branding' },
       { name: 'Template Selection', href: '/finance/branding/invoice-selection' },
@@ -337,6 +338,7 @@ export const INITIAL_SUBSCRIBED_MODULES = [
   'reports',
   'settings'
 ];
+
 
 
 
