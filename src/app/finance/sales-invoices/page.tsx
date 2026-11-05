@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   FileText,
@@ -43,6 +43,30 @@ interface InvoiceItem {
   status: 'Draft' | 'Sent' | 'Overdue' | 'Part-paid' | 'Paid';
 }
 
+function formatGBP(n: number): string {
+  return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function mapApiInvoice(inv: Record<string, unknown>): InvoiceItem {
+  return {
+    id: String(inv.id),
+    invoiceNo: inv.invoice_no as string,
+    poRef: inv.po_ref as string,
+    customerName: inv.customer_name as string,
+    tags: JSON.parse((inv.tags as string) || '[]') as string[],
+    issuedDate: inv.issued_date
+      ? new Date(inv.issued_date as string).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '',
+    dueDate: inv.due_date
+      ? new Date(inv.due_date as string).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '',
+    dueDays: inv.due_days as string,
+    grossAmount: formatGBP(inv.gross_amount as number),
+    outstandingAmount: formatGBP(inv.outstanding_amount as number),
+    status: inv.status as InvoiceItem['status'],
+  };
+}
+
 export default function SalesInvoicesListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('All statuses');
@@ -68,141 +92,23 @@ export default function SalesInvoicesListPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
-  // Sample data matching screenshot exactly
-  const initialInvoices: InvoiceItem[] = [
-    {
-      id: '1',
-      invoiceNo: 'INV-2025-0423',
-      poRef: 'PO-4881',
-      customerName: 'ABC Ltd',
-      tags: ['Key Account', 'Web Design'],
-      issuedDate: '15 Apr 2025',
-      dueDate: '15 May 2025',
-      dueDays: '30 days',
-      grossAmount: '£16,320.00',
-      outstandingAmount: '£16,320.00',
-      status: 'Overdue',
-    },
-    {
-      id: '2',
-      invoiceNo: 'INV-2025-0422',
-      poRef: 'PO-4873',
-      customerName: 'Tech Solutions Ltd',
-      tags: ['Standard'],
-      issuedDate: '14 Apr 2025',
-      dueDate: '14 May 2025',
-      dueDays: '29 days',
-      grossAmount: '£4,800.00',
-      outstandingAmount: '£2,400.00',
-      status: 'Part-paid',
-    },
-    {
-      id: '3',
-      invoiceNo: 'INV-2025-0421',
-      poRef: 'PO-48576',
-      customerName: 'Global Services Group',
-      tags: ['Key Account', 'Consultancy'],
-      issuedDate: '10 Apr 2025',
-      dueDate: '11 May 2025',
-      dueDays: '25 days',
-      grossAmount: '£8,400.00',
-      outstandingAmount: '£8,400.00',
-      status: 'Overdue',
-    },
-    {
-      id: '4',
-      invoiceNo: 'INV-2025-0420',
-      poRef: 'PO-48575',
-      customerName: 'Riverside Estates',
-      tags: ['Standard'],
-      issuedDate: '05 Apr 2025',
-      dueDate: '05 May 2025',
-      dueDays: '20 days',
-      grossAmount: '£2,800.00',
-      outstandingAmount: '£0.00',
-      status: 'Paid',
-    },
-    {
-      id: '5',
-      invoiceNo: 'INV-2025-0419',
-      poRef: 'PO-48532',
-      customerName: 'City Council',
-      tags: ['Government', 'Maintenance'],
-      issuedDate: '02 Apr 2025',
-      dueDate: '02 May 2025',
-      dueDays: '17 days',
-      grossAmount: '£5,600.00',
-      outstandingAmount: '£5,600.00',
-      status: 'Overdue',
-    },
-    {
-      id: '6',
-      invoiceNo: 'INV-2025-0418',
-      poRef: 'PO-48531',
-      customerName: 'Mainway Retail Ltd',
-      tags: ['Standard'],
-      issuedDate: '01 Apr 2025',
-      dueDate: '01 May 2025',
-      dueDays: '16 days',
-      grossAmount: '£1,200.00',
-      outstandingAmount: '£0.00',
-      status: 'Paid',
-    },
-    {
-      id: '7',
-      invoiceNo: 'INV-2025-0417',
-      poRef: 'PO-48669',
-      customerName: 'Acme Trading Co',
-      tags: ['Standard'],
-      issuedDate: '28 Mar 2025',
-      dueDate: '27 Apr 2025',
-      dueDays: '12 days',
-      grossAmount: '£3,750.00',
-      outstandingAmount: '£1,875.00',
-      status: 'Part-paid',
-    },
-    {
-      id: '8',
-      invoiceNo: 'INV-2025-0416',
-      poRef: 'PO-44865',
-      customerName: 'Bright Future Ltd',
-      tags: ['New Customer', 'Training'],
-      issuedDate: '25 Mar 2025',
-      dueDate: '24 Apr 2025',
-      dueDays: '9 days',
-      grossAmount: '£4,500.00',
-      outstandingAmount: '£0.00',
-      status: 'Sent',
-    },
-    {
-      id: '9',
-      invoiceNo: 'INV-2025-0415',
-      poRef: 'PO-44853',
-      customerName: 'Summit Healthcare',
-      tags: ['Standard'],
-      issuedDate: '20 Mar 2025',
-      dueDate: '19 Apr 2025',
-      dueDays: '4 days',
-      grossAmount: '£6,900.00',
-      outstandingAmount: '£6,900.00',
-      status: 'Overdue',
-    },
-    {
-      id: '10',
-      invoiceNo: 'INV-2025-0414',
-      poRef: 'PO-44860',
-      customerName: 'Western Logistics',
-      tags: ['Standard'],
-      issuedDate: '18 Mar 2025',
-      dueDate: '17 Apr 2025',
-      dueDays: '2 days',
-      grossAmount: '£3,200.00',
-      outstandingAmount: '£0.00',
-      status: 'Paid',
-    },
-  ];
+  // ── API State ────────────────────────────────────────────────────────────
+  const [apiInvoices, setApiInvoices] = useState<InvoiceItem[]>([]);
+
+  useEffect(() => {
+    fetch('/api/invoices')
+      .then((r) => r.json())
+      .then((json) => setApiInvoices((json.data as Record<string, unknown>[]).map(mapApiInvoice)))
+      .catch(console.error);
+  }, []);
+
+  // Use live data
+
+  // Use live data
+  const initialInvoices: InvoiceItem[] = apiInvoices;
 
   // Filter logic
+
   const filteredInvoices = useMemo(() => {
     return initialInvoices.filter((inv) => {
       const matchesSearch =

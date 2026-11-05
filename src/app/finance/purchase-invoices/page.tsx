@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -223,9 +223,38 @@ export default function SupplierBillsListPage() {
     },
   ];
 
+  // ── API State ────────────────────────────────────────────────────────────
+  const [apiBills, setApiBills] = useState<SupplierBillRecord[]>([]);
+
+  useEffect(() => {
+    fetch('/api/purchase-invoices')
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped: SupplierBillRecord[] = json.data.map((b: any) => ({
+            id: b.bill_no,
+            billRef: b.bill_no,
+            description: 'Purchase Invoice - ' + b.supplier_name,
+            supplierName: b.supplier_name,
+            supplierCode: 'SUP-001',
+            billDate: b.issued_date || '01 Apr 2025',
+            dueDate: b.due_date || '01 May 2025',
+            grossAmount: '£' + Number(b.gross_amount || 0).toLocaleString('en-GB', { minimumFractionDigits: 2 }),
+            grossRaw: Number(b.gross_amount || 0),
+            outstandingAmount: '£' + Number(b.outstanding_amount || 0).toLocaleString('en-GB', { minimumFractionDigits: 2 }),
+            outstandingRaw: Number(b.outstanding_amount || 0),
+            approvalStatus: 'Approved',
+            paymentStatus: b.status === 'Paid' ? 'Paid' : (b.status === 'Part-paid' ? 'Part-paid' : 'Not paid'),
+          }));
+          setApiBills(mapped);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   // Filtering
   const filteredBills = useMemo(() => {
-    return initialBills.filter((bill) => {
+    return (apiBills.length > 0 ? apiBills : initialBills).filter((bill) => {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
         bill.billRef.toLowerCase().includes(q) ||

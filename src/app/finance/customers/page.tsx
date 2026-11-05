@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   UsersThree,
   UserCheck,
@@ -46,6 +46,32 @@ interface CustomerRecord {
   avatarBg: string;
 }
 
+function formatGBP(n: number): string {
+  return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function mapApiCustomer(c: Record<string, unknown>): CustomerRecord {
+  return {
+    id: String(c.id),
+    name: c.name as string,
+    code: c.code as string,
+    type: c.type as CustomerRecord['type'],
+    contactName: c.contact_name as string,
+    contactEmail: c.contact_email as string,
+    balance: formatGBP(c.balance as number),
+    overdue: formatGBP(c.overdue as number),
+    lastInvoiceDate: c.last_invoice_date
+      ? new Date(c.last_invoice_date as string).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—',
+    paymentTerms: c.payment_terms as string,
+    managerName: c.manager_name as string,
+    managerInitials: c.manager_initials as string,
+    managerAvatarBg: c.manager_avatar_bg as string,
+    status: c.status as CustomerRecord['status'],
+    avatarBg: c.avatar_bg as string,
+  };
+}
+
 export default function CustomersListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('All statuses');
@@ -68,181 +94,29 @@ export default function CustomersListPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Initial customer list matching screenshot exactly
-  const initialCustomers: CustomerRecord[] = [
-    {
-      id: '1',
-      name: 'ABC Ltd',
-      code: 'CUS-001',
-      type: 'Corporate',
-      contactName: 'Sarah Clarke',
-      contactEmail: 'sarah.clarke@abcltd.co.uk',
-      balance: '£18,250.00',
-      overdue: '£0.00',
-      lastInvoiceDate: '12 Apr 2025',
-      paymentTerms: 'Net 30 days',
-      managerName: 'John Doe',
-      managerInitials: 'JD',
-      managerAvatarBg: '#2563EB',
-      status: 'Active',
-      avatarBg: '#2563EB',
-    },
-    {
-      id: '2',
-      name: 'Global Tech Solutions',
-      code: 'CUS-002',
-      type: 'Corporate',
-      contactName: 'James Wilson',
-      contactEmail: 'j.wilson@globaltech.co.uk',
-      balance: '£24,500.00',
-      overdue: '£4,500.00',
-      lastInvoiceDate: '10 Apr 2025',
-      paymentTerms: 'Net 34 days',
-      managerName: 'Sarah Clarke',
-      managerInitials: 'SC',
-      managerAvatarBg: '#4F46E5',
-      status: 'Overdue',
-      avatarBg: '#059669',
-    },
-    {
-      id: '3',
-      name: 'Smith & Co',
-      code: 'CUS-003',
-      type: 'SME',
-      contactName: 'Emma Roberts',
-      contactEmail: 'emma@smithsanco.co.uk',
-      balance: '£8,750.00',
-      overdue: '£2,300.00',
-      lastInvoiceDate: '02 Apr 2025',
-      paymentTerms: 'Net 14 days',
-      managerName: 'Michael Khan',
-      managerInitials: 'MK',
-      managerAvatarBg: '#0D9488',
-      status: 'Overdue',
-      avatarBg: '#10B981',
-    },
-    {
-      id: '4',
-      name: 'Bright Futures Ltd',
-      code: 'CUS-004',
-      type: 'Corporate',
-      contactName: 'David Chen',
-      contactEmail: 'd.chen@brightfutures.co.uk',
-      balance: '£0.00',
-      overdue: '£0.00',
-      lastInvoiceDate: '05 Apr 2025',
-      paymentTerms: 'Net 30 days',
-      managerName: 'Lisa Turner',
-      managerInitials: 'LT',
-      managerAvatarBg: '#9333EA',
-      status: 'Active',
-      avatarBg: '#9333EA',
-    },
-    {
-      id: '5',
-      name: 'City Council',
-      code: 'CUS-005',
-      type: 'Government',
-      contactName: 'Laura Green',
-      contactEmail: 'laura.green@citycouncil.gov.uk',
-      balance: '£12,400.00',
-      overdue: '£0.00',
-      lastInvoiceDate: '08 Apr 2025',
-      paymentTerms: 'Net 30 days',
-      managerName: 'John Doe',
-      managerInitials: 'JD',
-      managerAvatarBg: '#2563EB',
-      status: 'Active',
-      avatarBg: '#0284C7',
-    },
-    {
-      id: '6',
-      name: 'Tech Dynamics',
-      code: 'CUS-006',
-      type: 'SME',
-      contactName: 'Robert Taylor',
-      contactEmail: 'robert@techdynamics.co.uk',
-      balance: '£5,200.00',
-      overdue: '£5,200.00',
-      lastInvoiceDate: '01 Apr 2025',
-      paymentTerms: 'Net 10 days',
-      managerName: 'Sarah Clarke',
-      managerInitials: 'SC',
-      managerAvatarBg: '#4F46E5',
-      status: 'Overdue',
-      avatarBg: '#D97706',
-    },
-    {
-      id: '7',
-      name: 'NextGen Systems',
-      code: 'CUS-007',
-      type: 'Corporate',
-      contactName: 'Sophie Martin',
-      contactEmail: 'sophie@nextgensystems.co.uk',
-      balance: '£18,900.00',
-      overdue: '£0.00',
-      lastInvoiceDate: '14 Apr 2025',
-      paymentTerms: 'Net 30 days',
-      managerName: 'Michael Khan',
-      managerInitials: 'MK',
-      managerAvatarBg: '#0D9488',
-      status: 'Active',
-      avatarBg: '#2563EB',
-    },
-    {
-      id: '8',
-      name: 'Urban Developments',
-      code: 'CUS-008',
-      type: 'Corporate',
-      contactName: 'Oliver Brown',
-      contactEmail: 'oliver@urbandev.co.uk',
-      balance: '£32,100.00',
-      overdue: '£12,690.00',
-      lastInvoiceDate: '10 Apr 2025',
-      paymentTerms: 'Net 30 days',
-      managerName: 'Lisa Turner',
-      managerInitials: 'LT',
-      managerAvatarBg: '#9333EA',
-      status: 'Overdue',
-      avatarBg: '#7C3AED',
-    },
-    {
-      id: '9',
-      name: 'Riverside Group',
-      code: 'CUS-009',
-      type: 'SME',
-      contactName: 'Natalie Scott',
-      contactEmail: 'natalie@riverside.co.uk',
-      balance: '£3,800.00',
-      overdue: '£0.00',
-      lastInvoiceDate: '07 Apr 2025',
-      paymentTerms: 'Net 14 days',
-      managerName: 'John Doe',
-      managerInitials: 'JD',
-      managerAvatarBg: '#2563EB',
-      status: 'Active',
-      avatarBg: '#059669',
-    },
-    {
-      id: '10',
-      name: 'Summit Holdings',
-      code: 'CUS-010',
-      type: 'Corporate',
-      contactName: 'Daniel Wright',
-      contactEmail: 'daniel@summitholdings.co.uk',
-      balance: '£27,450.00',
-      overdue: '£3,200.00',
-      lastInvoiceDate: '11 Apr 2025',
-      paymentTerms: 'Net 30 days',
-      managerName: 'Sarah Clarke',
-      managerInitials: 'SC',
-      managerAvatarBg: '#4F46E5',
-      status: 'Overdue',
-      avatarBg: '#0284C7',
-    },
-  ];
+  // ── API State ────────────────────────────────────────────────────────────
+  const [apiCustomers, setApiCustomers] = useState<CustomerRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/customers')
+      .then((r) => r.json())
+      .then((json) => {
+        setApiCustomers((json.data as Record<string, unknown>[]).map(mapApiCustomer));
+        setApiError(null);
+      })
+      .catch(() => setApiError('Failed to load customers'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // ── Use API data ─────────────────────────────────────────────────────────
+  const initialCustomers: CustomerRecord[] = apiCustomers;
+
 
   // Filter logic
+
   const filteredCustomers = useMemo(() => {
     return initialCustomers.filter((item) => {
       const matchesSearch =

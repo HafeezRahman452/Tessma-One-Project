@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Plus, UploadSimple, ArrowsClockwise, DotsThreeVertical, CaretDown, Coins, FileText,
   WarningCircle, CalendarBlank, ArrowUp, ArrowDown, MagnifyingGlass, Funnel, ArrowRight,
@@ -71,9 +71,43 @@ export default function BankAccountsPage() {
   const [selected, setSelected] = useState(1);
   const [detailTab, setDetailTab] = useState('Recent Transactions');
   const [q, setQ] = useState('');
-  const sel = accounts.find(a => a.id === selected)!;
+  const [bankAccountsList, setBankAccountsList] = useState<Acc[]>(accounts);
 
-  const rows = accounts.filter(a =>
+  useEffect(() => {
+    fetch('/api/bank-accounts')
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped: Acc[] = json.data.map((item: any, idx: number) => ({
+            id: item.id || idx + 1,
+            name: item.name,
+            sub: item.bank_name + ' Business Account',
+            bank: item.bank_name || 'HSBC UK',
+            bankColor: '#2563EB',
+            bankMark: '◆',
+            num: item.account_number ? item.account_number.slice(-4) : '4587',
+            cur: item.currency || 'GBP',
+            current: '£' + Number(item.balance || 0).toLocaleString('en-GB', { minimumFractionDigits: 2 }),
+            avail: '£' + Number(item.balance || 0).toLocaleString('en-GB', { minimumFractionDigits: 2 }),
+            date: '15 Apr 2025',
+            time: '10:24',
+            status: item.status === 'Active' ? 'Active' : 'Inactive',
+            iconBg: '#DCFCE7',
+            iconColor: '#16A34A',
+            type: 'Current Account',
+            sort: item.sort_code || '40-05-30',
+            iban: 'GB33 HBUK 4005 ' + (item.account_number || '3012 3456'),
+            bic: 'HBUKGB4B'
+          }));
+          setBankAccountsList(mapped);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const sel = bankAccountsList.find(a => a.id === selected) || bankAccountsList[0] || accounts[0];
+
+  const rows = bankAccountsList.filter(a =>
     (tab === 'all' || (tab === 'active' ? a.status !== 'Inactive' : a.status === 'Inactive')) &&
     (a.name + a.bank + a.num).toLowerCase().includes(q.toLowerCase()));
 

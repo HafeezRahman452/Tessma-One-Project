@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Plus,
@@ -38,7 +38,7 @@ export default function FinanceOverviewPage() {
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
   // Sample Recent Invoices matching screenshot
-  const [invoices] = useState([
+  const [invoices, setInvoices] = useState([
     { id: 'INV-2025-0423', customer: 'ABC Ltd', issueDate: '15 Apr 2025', dueDate: '15 May 2025', amount: '£16,320.00', status: 'Sent' },
     { id: 'INV-2025-0422', customer: 'Global Solutions', issueDate: '14 Apr 2025', dueDate: '14 May 2025', amount: '£8,400.00', status: 'Overdue' },
     { id: 'INV-2025-0421', customer: 'Riverside Group', issueDate: '12 Apr 2025', dueDate: '12 May 2025', amount: '£4,800.00', status: 'Paid' },
@@ -47,13 +47,18 @@ export default function FinanceOverviewPage() {
   ]);
 
   // Sample Recent Bills matching screenshot
-  const [bills] = useState([
+  const [bills, setBills] = useState([
     { id: 'BILL-2025-0187', supplier: 'Tech Suppliers Ltd', billDate: '15 Apr 2025', dueDate: '15 May 2025', amount: '£2,450.00', status: 'Awaiting approval' },
     { id: 'BILL-2025-0186', supplier: 'Office Solutions', billDate: '14 Apr 2025', dueDate: '14 May 2025', amount: '£1,200.00', status: 'Approved' },
     { id: 'BILL-2025-0185', supplier: 'Cloud Services Ltd', billDate: '12 Apr 2025', dueDate: '12 May 2025', amount: '£980.00', status: 'Awaiting approval' },
     { id: 'BILL-2025-0184', supplier: 'Facilities Group', billDate: '10 Apr 2025', dueDate: '10 May 2025', amount: '£3,600.00', status: 'Paid' },
     { id: 'BILL-2025-0183', supplier: 'Marketing Co', billDate: '08 Apr 2025', dueDate: '08 May 2025', amount: '£1,750.00', status: 'On hold' },
   ]);
+
+  useEffect(() => {
+    fetch('/api/invoices').then(r=>r.json()).then(j=>{if(j.data&&j.data.length){setInvoices(j.data.slice(0,5).map((inv: any)=>({id:inv.invoice_no,customer:inv.customer_name,issueDate:inv.issued_date||'15 Apr 2025',dueDate:inv.due_date||'15 May 2025',amount:'£'+Number(inv.gross_amount).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}),status:inv.status})));}}).catch(console.error);
+    fetch('/api/purchase-invoices').then(r=>r.json()).then(j=>{if(j.data&&j.data.length){setBills(j.data.slice(0,5).map((bill: any)=>({id:bill.bill_no,supplier:bill.supplier_name,billDate:bill.issued_date||'15 Apr 2025',dueDate:bill.due_date||'15 May 2025',amount:'£'+Number(bill.gross_amount).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}),status:bill.status==='Received'?'Awaiting approval':bill.status})));}}).catch(console.error);
+  }, []);
 
   // Invoice status badge renderer
   const renderStatusBadge = (status: string) => {

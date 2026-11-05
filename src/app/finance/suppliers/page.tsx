@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -268,9 +268,42 @@ export default function SuppliersListPage() {
     },
   ];
 
+  // ── API State ────────────────────────────────────────────────────────────
+  const [apiSuppliers, setApiSuppliers] = useState<SupplierRecord[]>([]);
+
+  useEffect(() => {
+    fetch('/api/suppliers')
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped: SupplierRecord[] = json.data.map((s: any, i: number) => ({
+            id: s.code || ('SUP-00' + (i + 1)),
+            name: s.name,
+            code: s.code,
+            iconBg: s.avatar_bg || '#2563EB',
+            iconType: 'building',
+            category: s.type || 'Office Supplies',
+            categoryColor: { bg: '#EFF6FF', text: '#2563EB' },
+            contactName: s.contact_name || '',
+            contactEmail: s.contact_email || '',
+            currentBalance: '£' + Number(s.balance || 0).toLocaleString('en-GB'),
+            balanceRaw: Number(s.balance || 0),
+            overdueAmount: '£' + Number(s.overdue || 0).toLocaleString('en-GB'),
+            overdueRaw: Number(s.overdue || 0),
+            lastBill: s.last_bill_date || '10 Apr 2025',
+            paymentTerms: s.payment_terms || '30 days',
+            bankStatus: 'Verified',
+            status: s.status === 'Active' ? 'Active' : 'Inactive',
+          }));
+          setApiSuppliers(mapped);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   // Filtering
   const filteredSuppliers = useMemo(() => {
-    return initialSuppliers.filter((sup) => {
+    return (apiSuppliers.length > 0 ? apiSuppliers : initialSuppliers).filter((sup) => {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
         sup.name.toLowerCase().includes(q) ||
