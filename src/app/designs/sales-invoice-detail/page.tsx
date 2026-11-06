@@ -84,7 +84,7 @@ export default function SalesInvoiceDetailPage() {
   const amountOutstanding = totalGbp - amountPaid;
 
   return (
-    <div style={{ padding: '24px 32px 48px', background: '#F8FAFC', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ padding: '0 0 48px', background: '#F8FAFC', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* Toast Notification */}
       {toastMessage && (

@@ -215,7 +215,7 @@ TESSMA ONE Finance Team`
   };
 
   return (
-    <div style={{ padding: '24px 32px', background: '#F8FAFC', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ padding: '0 0 32px', background: '#F8FAFC', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* Toast Notification */}
       {toastMessage && (
