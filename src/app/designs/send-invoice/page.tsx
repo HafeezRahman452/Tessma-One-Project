@@ -3,20 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  House,
   EnvelopeSimple,
   CaretRight,
   CaretDown,
   PaperPlaneTilt,
-  Eye,
   FloppyDisk,
   FilePdf,
-  PencilSimple,
-  ArrowSquareOut,
-  UsersThree,
-  CheckCircle,
+  Plus,
   X,
-  Buildings,
   TextB,
   TextItalic,
   TextUnderline,
@@ -24,92 +18,97 @@ import {
   ListNumbers,
   TextAlignLeft,
   Link as LinkIcon,
-  Image as ImageIcon,
   Code,
   Calendar,
   Clock,
+  DownloadSimple,
+  ClockCounterClockwise,
+  CheckCircle,
+  DeviceMobile,
+  Desktop,
+  FileDoc,
+  FileXls,
   Check
 } from '@phosphor-icons/react';
 
-interface Recipient {
+interface RecipientTag {
   id: string;
-  name: string;
   email: string;
-  initials: string;
-  role?: string;
-  company?: string;
 }
 
-const STORAGE_KEY = 'tessma_send_invoice_form_data';
+interface AttachedDoc {
+  id: string;
+  name: string;
+  size: string;
+  type: 'pdf' | 'doc' | 'xls';
+}
 
-export default function SendInvoicePage() {
-  // Form state
-  const [toRecipients, setToRecipients] = useState<Recipient[]>([
-    {
-      id: '1',
-      name: 'Sarah Lawson',
-      email: 'sarah.lawson@abcsolutions.co.uk',
-      initials: 'SL',
-      role: 'Finance Manager',
-      company: 'ABC Solutions Ltd'
-    }
+const STORAGE_KEY = 'tessma_send_invoice_email_v2';
+
+export default function SendInvoiceEmailPage() {
+  // Recipients
+  const [toRecipients, setToRecipients] = useState<RecipientTag[]>([
+    { id: '1', email: 'sarah.clarke@abc-ltd.co.uk' }
   ]);
   const [toInput, setToInput] = useState('');
 
-  const [ccRecipients, setCcRecipients] = useState<Recipient[]>([
-    {
-      id: '2',
-      name: 'Mark Stevens',
-      email: 'mark.stevens@abcsolutions.co.uk',
-      initials: 'MS',
-      role: 'Operations Director',
-      company: 'ABC Solutions Ltd'
-    }
+  const [ccRecipients, setCcRecipients] = useState<RecipientTag[]>([
+    { id: '2', email: 'accounts@abc-ltd.co.uk' }
   ]);
   const [ccInput, setCcInput] = useState('');
 
-  const [bccRecipients, setBccRecipients] = useState<Recipient[]>([]);
+  const [bccRecipients, setBccRecipients] = useState<RecipientTag[]>([]);
   const [bccInput, setBccInput] = useState('');
 
-  const [replyTo, setReplyTo] = useState('accounts@yourcompany.co.uk');
-  const [customerContact, setCustomerContact] = useState('Sarah Lawson (Finance Manager)');
-  const [subject, setSubject] = useState('Invoice INV-2025-0042 from Your Company Ltd');
+  // Dropdowns / inputs
+  const [fromAddress, setFromAddress] = useState('finance@tessmaone.co.uk (TESSMA ONE Finance)');
+  const [replyTo, setReplyTo] = useState('sarah.clarke@tessmaone.co.uk');
+  const [emailTemplate, setEmailTemplate] = useState('Invoice - Standard');
+  const [subject, setSubject] = useState('Invoice INV-2025-0423 from TESSMA ONE');
   const [message, setMessage] = useState(
-`Dear {{contact_name}},
+`Dear Sarah,
 
-Please find attached invoice {{invoice_number}} for {{invoice_amount}}.
-You can also make a secure payment using the link below.
+Please find attached invoice INV-2025-0423 for £16,320.00.
 
-If you have any questions, please don't hesitate to get in touch.
+Payment is due by 15 May 2025 (Net 30). You can find the full invoice details in the attached PDF.
+
+Thank you for your continued business. If you have any questions, please don't hesitate to get in touch.
 
 Kind regards,
-Your Company Ltd`
+John Doe
+TESSMA ONE Finance Team`
   );
 
-  // Checkbox options
-  const [attachPdf, setAttachPdf] = useState(true);
-  const [attachStatement, setAttachStatement] = useState(true);
-  const [includePaymentLink, setIncludePaymentLink] = useState(true);
-  const [includeTerms, setIncludeTerms] = useState(true);
-  const [saveAsDefault, setSaveAsDefault] = useState(false);
-  const [sendCopyToInternal, setSendCopyToInternal] = useState(false);
+  // Attachments
+  const [attachments, setAttachments] = useState<AttachedDoc[]>([
+    { id: '1', name: 'INV-2025-0423.pdf', size: '245 KB', type: 'pdf' },
+    { id: '2', name: 'Project acceptance certificate.pdf', size: '1.2 MB', type: 'doc' },
+    { id: '3', name: 'Detailed breakdown.xlsx', size: '340 KB', type: 'xls' }
+  ]);
 
-  // Send options
-  const [sendType, setSendType] = useState<'now' | 'schedule'>('now');
-  const [scheduleDate, setScheduleDate] = useState('2025-04-01');
+  // Delivery options
+  const [deliveryType, setDeliveryType] = useState<'now' | 'schedule'>('now');
+  const [scheduleDate, setScheduleDate] = useState('2025-05-01');
   const [scheduleTime, setScheduleTime] = useState('09:00');
 
-  // UI state
+  // Toggle switches
+  const [sendMeCopy, setSendMeCopy] = useState(true);
+  const [requestReadReceipt, setRequestReadReceipt] = useState(false);
+  const [saveAsDefault, setSaveAsDefault] = useState(false);
+
+  // Preview device mode
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
+
+  // UI toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isSavedFeedback, setIsSavedFeedback] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Load from LocalStorage on mount
+  // Load saved state from LocalStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -118,130 +117,99 @@ Your Company Ltd`
         if (parsed.toRecipients) setToRecipients(parsed.toRecipients);
         if (parsed.ccRecipients) setCcRecipients(parsed.ccRecipients);
         if (parsed.bccRecipients) setBccRecipients(parsed.bccRecipients);
-        if (parsed.replyTo !== undefined) setReplyTo(parsed.replyTo);
-        if (parsed.customerContact !== undefined) setCustomerContact(parsed.customerContact);
-        if (parsed.subject !== undefined) setSubject(parsed.subject);
-        if (parsed.message !== undefined) setMessage(parsed.message);
-        if (parsed.attachPdf !== undefined) setAttachPdf(parsed.attachPdf);
-        if (parsed.attachStatement !== undefined) setAttachStatement(parsed.attachStatement);
-        if (parsed.includePaymentLink !== undefined) setIncludePaymentLink(parsed.includePaymentLink);
-        if (parsed.includeTerms !== undefined) setIncludeTerms(parsed.includeTerms);
+        if (parsed.fromAddress) setFromAddress(parsed.fromAddress);
+        if (parsed.replyTo) setReplyTo(parsed.replyTo);
+        if (parsed.emailTemplate) setEmailTemplate(parsed.emailTemplate);
+        if (parsed.subject) setSubject(parsed.subject);
+        if (parsed.message) setMessage(parsed.message);
+        if (parsed.deliveryType) setDeliveryType(parsed.deliveryType);
+        if (parsed.scheduleDate) setScheduleDate(parsed.scheduleDate);
+        if (parsed.scheduleTime) setScheduleTime(parsed.scheduleTime);
+        if (parsed.sendMeCopy !== undefined) setSendMeCopy(parsed.sendMeCopy);
+        if (parsed.requestReadReceipt !== undefined) setRequestReadReceipt(parsed.requestReadReceipt);
         if (parsed.saveAsDefault !== undefined) setSaveAsDefault(parsed.saveAsDefault);
-        if (parsed.sendCopyToInternal !== undefined) setSendCopyToInternal(parsed.sendCopyToInternal);
-        if (parsed.sendType !== undefined) setSendType(parsed.sendType);
-        if (parsed.scheduleDate !== undefined) setScheduleDate(parsed.scheduleDate);
-        if (parsed.scheduleTime !== undefined) setScheduleTime(parsed.scheduleTime);
       }
     } catch (e) {
-      console.error('Failed to load saved form data:', e);
+      console.error('Failed to load from storage:', e);
     }
   }, []);
 
-  // Save to LocalStorage helper
-  const saveFormData = (override?: Partial<any>) => {
+  // Save to LocalStorage
+  const saveFormData = (customMsg?: string) => {
     try {
-      const data = {
+      const payload = {
         toRecipients,
         ccRecipients,
         bccRecipients,
+        fromAddress,
         replyTo,
-        customerContact,
+        emailTemplate,
         subject,
         message,
-        attachPdf,
-        attachStatement,
-        includePaymentLink,
-        includeTerms,
-        saveAsDefault,
-        sendCopyToInternal,
-        sendType,
+        deliveryType,
         scheduleDate,
         scheduleTime,
-        ...override
+        sendMeCopy,
+        requestReadReceipt,
+        saveAsDefault
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       setIsSavedFeedback(true);
       setTimeout(() => setIsSavedFeedback(false), 2000);
+      if (customMsg) showToast(customMsg);
     } catch (e) {
-      console.error('Failed to save to localStorage:', e);
+      console.error('Failed to save to storage:', e);
     }
   };
 
-  // Auto-save on field changes
+  // Auto-save on change
   useEffect(() => {
-    const handler = setTimeout(() => {
+    const timer = setTimeout(() => {
       saveFormData();
     }, 600);
-    return () => clearTimeout(handler);
+    return () => clearTimeout(timer);
   }, [
     toRecipients,
     ccRecipients,
     bccRecipients,
+    fromAddress,
     replyTo,
-    customerContact,
+    emailTemplate,
     subject,
     message,
-    attachPdf,
-    attachStatement,
-    includePaymentLink,
-    includeTerms,
-    saveAsDefault,
-    sendCopyToInternal,
-    sendType,
+    deliveryType,
     scheduleDate,
-    scheduleTime
+    scheduleTime,
+    sendMeCopy,
+    requestReadReceipt,
+    saveAsDefault
   ]);
 
-  const removeToRecipient = (id: string) => {
-    setToRecipients(prev => prev.filter(r => r.id !== id));
-  };
+  const removeTo = (id: string) => setToRecipients(prev => prev.filter(r => r.id !== id));
+  const removeCc = (id: string) => setCcRecipients(prev => prev.filter(r => r.id !== id));
+  const removeBcc = (id: string) => setBccRecipients(prev => prev.filter(r => r.id !== id));
+  const removeAttachment = (id: string) => setAttachments(prev => prev.filter(a => a.id !== id));
 
-  const removeCcRecipient = (id: string) => {
-    setCcRecipients(prev => prev.filter(r => r.id !== id));
-  };
-
-  const removeBccRecipient = (id: string) => {
-    setBccRecipients(prev => prev.filter(r => r.id !== id));
-  };
-
-  const addToRecipient = (e: React.KeyboardEvent) => {
+  const handleAddTo = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && toInput.trim()) {
       e.preventDefault();
-      const newRec: Recipient = {
-        id: Date.now().toString(),
-        name: toInput.trim(),
-        email: toInput.trim(),
-        initials: toInput.trim().substring(0, 2).toUpperCase()
-      };
-      setToRecipients(prev => [...prev, newRec]);
+      setToRecipients(prev => [...prev, { id: Date.now().toString(), email: toInput.trim() }]);
       setToInput('');
     }
   };
 
-  const addCcRecipient = (e: React.KeyboardEvent) => {
+  const handleAddCc = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && ccInput.trim()) {
       e.preventDefault();
-      const newRec: Recipient = {
-        id: Date.now().toString(),
-        name: ccInput.trim(),
-        email: ccInput.trim(),
-        initials: ccInput.trim().substring(0, 2).toUpperCase()
-      };
-      setCcRecipients(prev => [...prev, newRec]);
+      setCcRecipients(prev => [...prev, { id: Date.now().toString(), email: ccInput.trim() }]);
       setCcInput('');
     }
   };
 
-  const addBccRecipient = (e: React.KeyboardEvent) => {
+  const handleAddBcc = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && bccInput.trim()) {
       e.preventDefault();
-      const newRec: Recipient = {
-        id: Date.now().toString(),
-        name: bccInput.trim(),
-        email: bccInput.trim(),
-        initials: bccInput.trim().substring(0, 2).toUpperCase()
-      };
-      setBccRecipients(prev => [...prev, newRec]);
+      setBccRecipients(prev => [...prev, { id: Date.now().toString(), email: bccInput.trim() }]);
       setBccInput('');
     }
   };
@@ -272,316 +240,308 @@ Your Company Ltd`
         </div>
       )}
 
-      {/* ── BREADCRUMB & HEADER ── */}
-      <div style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B', marginBottom: '8px' }}>
-          <Link href="/dashboard" style={{ color: '#64748B', display: 'flex', alignItems: 'center' }}>
-            <House size={16} />
-          </Link>
-          <CaretRight size={12} />
-          <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
-          <CaretRight size={12} />
-          <Link href="/finance/branding" style={{ color: '#64748B', textDecoration: 'none' }}>Branding & Company Identity</Link>
-          <CaretRight size={12} />
-          <span style={{ color: '#0F172A', fontWeight: 600 }}>Send Invoice</span>
+      {/* ── BREADCRUMB & HEADER ROW ── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#64748B', marginBottom: '6px' }}>
+            <Link href="/finance" style={{ color: '#64748B', textDecoration: 'none' }}>Finance</Link>
+            <CaretRight size={12} />
+            <Link href="/finance/sales-invoices" style={{ color: '#64748B', textDecoration: 'none' }}>Sales</Link>
+            <CaretRight size={12} />
+            <Link href="/finance/sales-invoices" style={{ color: '#64748B', textDecoration: 'none' }}>Invoice INV-2025-0423</Link>
+            <CaretRight size={12} />
+            <span style={{ color: '#0F172A', fontWeight: 600 }}>Send invoice</span>
+          </div>
+
+          <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+            Send invoice
+          </h1>
+          <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0 0' }}>
+            Send invoice INV-2025-0423 to your customer via email with attached documents.
+          </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
+        {/* Top Header Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button 
+            onClick={() => showToast('Action cancelled')}
+            style={{
+              padding: '8px 16px',
+              background: '#FFFFFF',
+              border: '1px solid #CBD5E1',
               borderRadius: '8px',
-              background: '#EFF6FF',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+
+          <button 
+            onClick={() => saveFormData('Draft saved successfully!')}
+            style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: '#2563EB',
-              marginTop: '2px'
-            }}>
-              <EnvelopeSimple size={22} weight="bold" />
-            </div>
-            <div>
-              <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-                Send Invoice
-              </h1>
-              <p style={{ fontSize: '13px', color: '#64748B', margin: '4px 0 0 0' }}>
-                Create and send your invoice to the customer via email with optional attachments and a payment link.
-              </p>
-            </div>
-          </div>
+              gap: '6px',
+              padding: '8px 16px',
+              background: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer'
+            }}
+          >
+            <FloppyDisk size={16} />
+            <span>Save draft</span>
+          </button>
 
-          {/* Auto-save indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: isSavedFeedback ? '#059669' : '#94A3B8' }}>
-            {isSavedFeedback ? (
-              <>
-                <Check size={14} weight="bold" color="#059669" />
-                <span style={{ fontWeight: 600 }}>All changes saved locally</span>
-              </>
-            ) : (
-              <span>Autosave active</span>
-            )}
-          </div>
+          <button 
+            onClick={() => {
+              saveFormData();
+              showToast(deliveryType === 'now' 
+                ? 'Invoice INV-2025-0423 sent successfully!' 
+                : `Invoice scheduled to send on ${scheduleDate} at ${scheduleTime}!`
+              );
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 18px',
+              background: '#006666',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#FFFFFF',
+              cursor: 'pointer'
+            }}
+          >
+            <PaperPlaneTilt size={16} weight="bold" />
+            <span>Send invoice</span>
+          </button>
         </div>
       </div>
 
-      {/* ── MAIN TWO-COLUMN WORKSPACE ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(600px, 1.7fr) minmax(380px, 1fr)', gap: '24px', alignItems: 'start' }}>
+      {/* ── MAIN WORKSPACE: 2 COLUMNS ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(620px, 1.45fr) minmax(440px, 1fr)', gap: '24px', alignItems: 'start' }}>
         
-        {/* ════ LEFT COLUMN: EMAIL DETAILS, OPTIONS, SEND CONTROLS ════ */}
+        {/* ════ LEFT COLUMN: EMAIL DETAILS, ATTACHMENTS & DELIVERY OPTIONS ════ */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           {/* Email Details Card */}
           <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '24px' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: '0 0 20px 0' }}>
-              Email Details
-            </h2>
+            
+            {/* Card Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '20px' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: '#ECFDF5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#059669',
+                marginTop: '1px'
+              }}>
+                <EnvelopeSimple size={18} weight="bold" />
+              </div>
+              <div>
+                <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                  Email details
+                </h2>
+                <p style={{ fontSize: '12.5px', color: '#64748B', margin: '2px 0 0 0' }}>
+                  Compose and send invoice INV-2025-0423 to your customer.
+                </p>
+              </div>
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Form Fields */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               
               {/* To field */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
                   To <span style={{ color: '#EF4444' }}>*</span>
                 </label>
                 <div style={{
                   border: '1px solid #CBD5E1',
                   borderRadius: '8px',
-                  padding: '6px 10px',
+                  padding: '6px 12px',
                   display: 'flex',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: '8px',
                   background: '#FFFFFF',
-                  minHeight: '42px'
+                  minHeight: '40px'
                 }}>
                   {toRecipients.map(r => (
                     <div key={r.id} style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      background: '#F1F5F9',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '999px',
-                      padding: '3px 10px 3px 4px',
-                      fontSize: '12px'
+                      gap: '6px',
+                      background: '#EFF6FF',
+                      border: '1px solid #BFDBFE',
+                      borderRadius: '6px',
+                      padding: '3px 8px',
+                      fontSize: '12px',
+                      color: '#1D4ED8',
+                      fontWeight: 500
                     }}>
-                      <div style={{
-                        width: '22px',
-                        height: '22px',
-                        borderRadius: '50%',
-                        background: '#8B5CF6',
-                        color: '#FFFFFF',
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {r.initials}
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontWeight: 600, color: '#0F172A', lineHeight: 1.1 }}>{r.name}</span>
-                        <span style={{ fontSize: '10.5px', color: '#64748B', lineHeight: 1.1 }}>{r.email}</span>
-                      </div>
+                      <span>{r.email}</span>
                       <button 
-                        onClick={() => removeToRecipient(r.id)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: '0 2px' }}
+                        onClick={() => removeTo(r.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#60A5FA', padding: 0, display: 'flex' }}
                       >
                         <X size={12} weight="bold" />
                       </button>
                     </div>
                   ))}
-                  
                   <input 
                     type="text"
                     value={toInput}
                     onChange={(e) => setToInput(e.target.value)}
-                    onKeyDown={addToRecipient}
-                    placeholder={toRecipients.length === 0 ? "Add recipient..." : "Add another recipient..."}
-                    style={{
-                      border: 'none',
-                      outline: 'none',
-                      fontSize: '12.5px',
-                      color: '#0F172A',
-                      flex: 1,
-                      minWidth: '140px',
-                      padding: '4px'
-                    }}
+                    onKeyDown={handleAddTo}
+                    placeholder="Add recipient..."
+                    style={{ border: 'none', outline: 'none', fontSize: '12.5px', color: '#0F172A', flex: 1, minWidth: '120px' }}
                   />
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
-                    <CaretDown size={14} color="#94A3B8" />
-                    <button 
-                      onClick={() => showToast('Select from contacts list opened')}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#0284C7',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <UsersThree size={15} />
-                      <span>Select from contacts</span>
-                    </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', fontSize: '12px', color: '#0284C7', fontWeight: 600 }}>
+                    <span style={{ cursor: 'pointer' }}>Cc</span>
+                    <span style={{ cursor: 'pointer' }}>Bcc</span>
                   </div>
                 </div>
               </div>
 
-              {/* Cc field */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center', gap: '12px' }}>
+              {/* CC field */}
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
-                  Cc
+                  CC
                 </label>
                 <div style={{
                   border: '1px solid #CBD5E1',
                   borderRadius: '8px',
-                  padding: '6px 10px',
+                  padding: '6px 12px',
                   display: 'flex',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: '8px',
                   background: '#FFFFFF',
-                  minHeight: '42px'
+                  minHeight: '40px'
                 }}>
                   {ccRecipients.map(r => (
                     <div key={r.id} style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      background: '#F1F5F9',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '999px',
-                      padding: '3px 10px 3px 4px',
-                      fontSize: '12px'
+                      gap: '6px',
+                      background: '#EFF6FF',
+                      border: '1px solid #BFDBFE',
+                      borderRadius: '6px',
+                      padding: '3px 8px',
+                      fontSize: '12px',
+                      color: '#1D4ED8',
+                      fontWeight: 500
                     }}>
-                      <div style={{
-                        width: '22px',
-                        height: '22px',
-                        borderRadius: '50%',
-                        background: '#0284C7',
-                        color: '#FFFFFF',
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {r.initials}
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontWeight: 600, color: '#0F172A', lineHeight: 1.1 }}>{r.name}</span>
-                        <span style={{ fontSize: '10.5px', color: '#64748B', lineHeight: 1.1 }}>{r.email}</span>
-                      </div>
+                      <span>{r.email}</span>
                       <button 
-                        onClick={() => removeCcRecipient(r.id)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: '0 2px' }}
+                        onClick={() => removeCc(r.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#60A5FA', padding: 0, display: 'flex' }}
                       >
                         <X size={12} weight="bold" />
                       </button>
                     </div>
                   ))}
-
                   <input 
                     type="text"
                     value={ccInput}
                     onChange={(e) => setCcInput(e.target.value)}
-                    onKeyDown={addCcRecipient}
-                    placeholder={ccRecipients.length === 0 ? "Add Cc recipient..." : "Add another recipient..."}
-                    style={{
-                      border: 'none',
-                      outline: 'none',
-                      fontSize: '12.5px',
-                      color: '#0F172A',
-                      flex: 1,
-                      minWidth: '140px',
-                      padding: '4px'
-                    }}
+                    onKeyDown={handleAddCc}
+                    placeholder="Add recipient..."
+                    style={{ border: 'none', outline: 'none', fontSize: '12.5px', color: '#0F172A', flex: 1, minWidth: '120px' }}
                   />
-
-                  <CaretDown size={14} color="#94A3B8" />
                 </div>
               </div>
 
-              {/* Bcc field */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center', gap: '12px' }}>
+              {/* BCC field */}
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
-                  Bcc
+                  BCC
                 </label>
                 <div style={{
                   border: '1px solid #CBD5E1',
                   borderRadius: '8px',
-                  padding: '6px 10px',
+                  padding: '6px 12px',
                   display: 'flex',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: '8px',
                   background: '#FFFFFF',
-                  minHeight: '42px'
+                  minHeight: '40px'
                 }}>
                   {bccRecipients.map(r => (
                     <div key={r.id} style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      background: '#F1F5F9',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '999px',
-                      padding: '3px 10px 3px 4px',
-                      fontSize: '12px'
+                      gap: '6px',
+                      background: '#EFF6FF',
+                      border: '1px solid #BFDBFE',
+                      borderRadius: '6px',
+                      padding: '3px 8px',
+                      fontSize: '12px',
+                      color: '#1D4ED8',
+                      fontWeight: 500
                     }}>
-                      <div style={{
-                        width: '22px',
-                        height: '22px',
-                        borderRadius: '50%',
-                        background: '#64748B',
-                        color: '#FFFFFF',
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {r.initials}
-                      </div>
-                      <span style={{ fontWeight: 600, color: '#0F172A' }}>{r.email}</span>
+                      <span>{r.email}</span>
                       <button 
-                        onClick={() => removeBccRecipient(r.id)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8' }}
+                        onClick={() => removeBcc(r.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#60A5FA', padding: 0, display: 'flex' }}
                       >
                         <X size={12} weight="bold" />
                       </button>
                     </div>
                   ))}
-
                   <input 
                     type="text"
                     value={bccInput}
                     onChange={(e) => setBccInput(e.target.value)}
-                    onKeyDown={addBccRecipient}
-                    placeholder="Add Bcc recipients..."
-                    style={{
-                      border: 'none',
-                      outline: 'none',
-                      fontSize: '12.5px',
-                      color: '#0F172A',
-                      flex: 1,
-                      minWidth: '140px',
-                      padding: '4px'
-                    }}
+                    onKeyDown={handleAddBcc}
+                    placeholder="Add recipient..."
+                    style={{ border: 'none', outline: 'none', fontSize: '12.5px', color: '#0F172A', flex: 1, minWidth: '120px' }}
                   />
+                </div>
+              </div>
 
-                  <CaretDown size={14} color="#94A3B8" />
+              {/* From field */}
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
+                  From <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                <div style={{
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: '#FFFFFF'
+                }}>
+                  <select 
+                    value={fromAddress}
+                    onChange={(e) => setFromAddress(e.target.value)}
+                    style={{ border: 'none', outline: 'none', fontSize: '13px', color: '#0F172A', width: '100%', background: 'transparent', cursor: 'pointer' }}
+                  >
+                    <option>finance@tessmaone.co.uk (TESSMA ONE Finance)</option>
+                    <option>billing@tessmaone.co.uk (TESSMA ONE Billing)</option>
+                  </select>
                 </div>
               </div>
 
               {/* Reply to field */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
                   Reply to
                 </label>
@@ -591,110 +551,59 @@ Your Company Ltd`
                   padding: '8px 12px',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
                   background: '#FFFFFF'
                 }}>
                   <input 
                     type="text"
                     value={replyTo}
                     onChange={(e) => setReplyTo(e.target.value)}
-                    style={{
-                      border: 'none',
-                      outline: 'none',
-                      fontSize: '13px',
-                      color: '#0F172A',
-                      width: '100%'
-                    }}
+                    style={{ border: 'none', outline: 'none', fontSize: '13px', color: '#0F172A', width: '100%' }}
                   />
                   <CaretDown size={14} color="#94A3B8" />
                 </div>
               </div>
 
-              {/* Customer Contact field with badge card */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center', gap: '12px' }}>
+              {/* Email template */}
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
-                  Customer Contact
+                  Email template
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: '12px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div style={{
                     border: '1px solid #CBD5E1',
                     borderRadius: '8px',
                     padding: '8px 12px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: '#FFFFFF'
+                    gap: '8px',
+                    background: '#FFFFFF',
+                    flex: 1
                   }}>
+                    <FilePdf size={16} color="#64748B" />
                     <select 
-                      value={customerContact}
-                      onChange={(e) => setCustomerContact(e.target.value)}
-                      style={{
-                        border: 'none',
-                        outline: 'none',
-                        fontSize: '13px',
-                        color: '#0F172A',
-                        background: 'transparent',
-                        width: '100%',
-                        cursor: 'pointer'
-                      }}
+                      value={emailTemplate}
+                      onChange={(e) => setEmailTemplate(e.target.value)}
+                      style={{ border: 'none', outline: 'none', fontSize: '13px', color: '#0F172A', width: '100%', background: 'transparent', cursor: 'pointer' }}
                     >
-                      <option>Sarah Lawson (Finance Manager)</option>
-                      <option>Mark Stevens (Operations Director)</option>
-                      <option>James Wilson (Account Manager)</option>
+                      <option>Invoice - Standard</option>
+                      <option>Invoice - Overdue Reminder</option>
+                      <option>Invoice - Gentle Notice</option>
                     </select>
                   </div>
-
-                  {/* Attached profile pill badge */}
-                  <div style={{
-                    border: '1px solid #E2E8F0',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    background: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    fontSize: '12px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        background: '#8B5CF6',
-                        color: '#FFFFFF',
-                        fontWeight: 700,
-                        fontSize: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        SL
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#0F172A' }}>Sarah Lawson</div>
-                        <div style={{ fontSize: '11px', color: '#64748B' }}>Finance Manager</div>
-                        <div style={{ fontSize: '11px', color: '#64748B' }}>ABC Solutions Ltd</div>
-                      </div>
-                    </div>
-
-                    <div style={{ textAlign: 'right', fontSize: '11px', color: '#64748B' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', color: '#0284C7' }}>
-                        <EnvelopeSimple size={13} color="#64748B" />
-                        <span>sarah.lawson@abcsolutions.co.uk</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', marginTop: '3px' }}>
-                        <span>📞</span>
-                        <span>+44 20 7123 4567</span>
-                      </div>
-                    </div>
-                  </div>
+                  <button 
+                    onClick={() => showToast('Manage templates modal')}
+                    style={{ background: 'none', border: 'none', color: '#0284C7', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  >
+                    Manage templates
+                  </button>
                 </div>
               </div>
 
-              {/* Email Subject field */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center', gap: '12px' }}>
+              {/* Subject */}
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '12px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
-                  Email Subject <span style={{ color: '#EF4444' }}>*</span>
+                  Subject <span style={{ color: '#EF4444' }}>*</span>
                 </label>
                 <div style={{
                   border: '1px solid #CBD5E1',
@@ -706,20 +615,13 @@ Your Company Ltd`
                     type="text"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    style={{
-                      border: 'none',
-                      outline: 'none',
-                      fontSize: '13px',
-                      color: '#0F172A',
-                      width: '100%',
-                      fontWeight: 500
-                    }}
+                    style={{ border: 'none', outline: 'none', fontSize: '13px', color: '#0F172A', width: '100%', fontWeight: 500 }}
                   />
                 </div>
               </div>
 
-              {/* Message field with rich text toolbar */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'start', gap: '12px', marginTop: '4px' }}>
+              {/* Message */}
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'start', gap: '12px', marginTop: '4px' }}>
                 <label style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', paddingTop: '8px' }}>
                   Message <span style={{ color: '#EF4444' }}>*</span>
                 </label>
@@ -729,47 +631,46 @@ Your Company Ltd`
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
+                    gap: '12px',
                     padding: '8px 12px',
                     borderBottom: '1px solid #E2E8F0',
                     background: '#F8FAFC'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#475569', cursor: 'pointer' }}>
-                        <span>Paragraph</span>
-                        <CaretDown size={12} />
-                      </div>
-                      <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextB size={15} weight="bold" /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextItalic size={15} /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextUnderline size={15} /></button>
-                      <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><ListBullets size={15} /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><ListNumbers size={15} /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextAlignLeft size={15} /></button>
-                      <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><LinkIcon size={15} /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><ImageIcon size={15} /></button>
-                      <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><Code size={15} /></button>
-                    </div>
-
-                    {/* Insert variable dropdown */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#0284C7', fontWeight: 600, cursor: 'pointer' }}
-                      onClick={() => {
-                        setMessage(prev => prev + ' {{payment_link}}');
-                        showToast('Inserted {{payment_link}} placeholder');
-                      }}
-                    >
-                      <span>Insert variable</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#475569', cursor: 'pointer' }}>
+                      <span>Inter</span>
                       <CaretDown size={12} />
                     </div>
+                    <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#475569', cursor: 'pointer' }}>
+                      <span>Normal</span>
+                      <CaretDown size={12} />
+                    </div>
+                    <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextB size={15} weight="bold" /></button>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextItalic size={15} /></button>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextUnderline size={15} /></button>
+                    <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><ListBullets size={15} /></button>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><ListNumbers size={15} /></button>
+                    <div style={{ width: '1px', height: '16px', background: '#CBD5E1' }}></div>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><TextAlignLeft size={15} /></button>
+                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}><LinkIcon size={15} /></button>
+                    <button 
+                      onClick={() => {
+                        setMessage(prev => prev + ' {payment_link}');
+                        showToast('Inserted placeholder');
+                      }}
+                      style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '2px' }}
+                    >
+                      <Code size={15} />
+                    </button>
                   </div>
 
-                  {/* Textarea */}
+                  {/* Message body */}
                   <textarea 
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    rows={8}
+                    rows={10}
                     style={{
                       width: '100%',
                       padding: '14px 16px',
@@ -788,141 +689,171 @@ Your Company Ltd`
             </div>
           </div>
 
-          {/* Additional Options Card */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '24px' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: '0 0 16px 0' }}>
-              Additional Options
-            </h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 28px' }}>
-              
-              {/* Option 1: Attach invoice PDF */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={attachPdf}
-                  onChange={(e) => setAttachPdf(e.target.checked)}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Attach invoice PDF</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>Include the invoice as a PDF attachment</div>
+          {/* Attachments Card */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ color: '#059669', display: 'flex' }}>
+                  <EnvelopeSimple size={18} weight="bold" />
                 </div>
-              </label>
-
-              {/* Option 2: Include standard terms */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={includeTerms}
-                  onChange={(e) => setIncludeTerms(e.target.checked)}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Include standard terms & conditions</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>Append your default terms and conditions</div>
+                  <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                    Attachments
+                  </h3>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>
+                    The invoice PDF will always be attached. You can add additional supporting documents if required.
+                  </div>
                 </div>
-              </label>
+              </div>
 
-              {/* Option 3: Attach customer statement */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={attachStatement}
-                  onChange={(e) => setAttachStatement(e.target.checked)}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Attach customer statement</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>Include latest statement of account</div>
+              <button 
+                onClick={() => {
+                  const newDoc: AttachedDoc = {
+                    id: Date.now().toString(),
+                    name: 'Supplementary_Doc.pdf',
+                    size: '120 KB',
+                    type: 'pdf'
+                  };
+                  setAttachments(prev => [...prev, newDoc]);
+                  showToast('Document attached');
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'none',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '6px',
+                  padding: '5px 12px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: '#0284C7',
+                  cursor: 'pointer'
+                }}
+              >
+                <Plus size={13} weight="bold" />
+                <span>Add document</span>
+              </button>
+            </div>
+
+            {/* Attachments Pill Cards */}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              {attachments.map(att => (
+                <div key={att.id} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  fontSize: '12px'
+                }}>
+                  <div style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '6px',
+                    background: att.type === 'pdf' ? '#FEE2E2' : (att.type === 'doc' ? '#DBEAFE' : '#DCFCE7'),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: att.type === 'pdf' ? '#DC2626' : (att.type === 'doc' ? '#2563EB' : '#16A34A')
+                  }}>
+                    {att.type === 'pdf' && <FilePdf size={16} weight="fill" />}
+                    {att.type === 'doc' && <FileDoc size={16} weight="fill" />}
+                    {att.type === 'xls' && <FileXls size={16} weight="fill" />}
+                  </div>
+
+                  <div>
+                    <div style={{ fontWeight: 600, color: '#0F172A' }}>{att.name}</div>
+                    <div style={{ fontSize: '11px', color: '#64748B' }}>{att.size}</div>
+                  </div>
+
+                  <button 
+                    onClick={() => removeAttachment(att.id)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: '2px' }}
+                  >
+                    <X size={13} weight="bold" />
+                  </button>
                 </div>
-              </label>
-
-              {/* Option 4: Save as default message */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={saveAsDefault}
-                  onChange={(e) => setSaveAsDefault(e.target.checked)}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Save as default message</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>Use this message as default for future invoices</div>
-                </div>
-              </label>
-
-              {/* Option 5: Include payment link */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={includePaymentLink}
-                  onChange={(e) => setIncludePaymentLink(e.target.checked)}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Include payment link</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>Add a secure online payment link in the email</div>
-                </div>
-              </label>
-
-              {/* Option 6: Send a copy to internal team */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={sendCopyToInternal}
-                  onChange={(e) => setSendCopyToInternal(e.target.checked)}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Send a copy to internal team</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '1px' }}>Send a copy to finance@yourcompany.co.uk</div>
-                </div>
-              </label>
-
+              ))}
             </div>
           </div>
 
-          {/* Send Options Card */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '24px' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', margin: '0 0 16px 0' }}>
-              Send Options
-            </h2>
+          {/* Delivery Options Card */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <PaperPlaneTilt size={16} color="#059669" weight="bold" />
+              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                Delivery options
+              </h3>
+            </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
+            {/* Radio Selectors */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
               
-              {/* Radio 1: Send now */}
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="sendType"
-                  value="now"
-                  checked={sendType === 'now'}
-                  onChange={() => setSendType('now')}
-                  style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                />
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Send now</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B' }}>Send the email immediately</div>
+              {/* Send Now Card */}
+              <div 
+                onClick={() => setDeliveryType('now')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: deliveryType === 'now' ? '2px solid #006666' : '1px solid #E2E8F0',
+                  background: deliveryType === 'now' ? '#F0FDF4' : '#FFFFFF',
+                  cursor: 'pointer',
+                  flex: 1
+                }}
+              >
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  border: '2px solid #006666',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {deliveryType === 'now' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#006666' }} />}
                 </div>
-              </label>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>Send now</div>
+                  <div style={{ fontSize: '11px', color: '#64748B' }}>Send the invoice immediately</div>
+                </div>
+              </div>
 
-              {/* Radio 2: Schedule send */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                  <input 
-                    type="radio" 
-                    name="sendType"
-                    value="schedule"
-                    checked={sendType === 'schedule'}
-                    onChange={() => setSendType('schedule')}
-                    style={{ width: '16px', height: '16px', marginTop: '2px', accentColor: '#006666', cursor: 'pointer' }}
-                  />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>Schedule send</div>
-                    <div style={{ fontSize: '11.5px', color: '#64748B' }}>Choose a date and time to send</div>
-                  </div>
-                </label>
+              {/* Schedule Send Card */}
+              <div 
+                onClick={() => setDeliveryType('schedule')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: deliveryType === 'schedule' ? '2px solid #006666' : '1px solid #E2E8F0',
+                  background: deliveryType === 'schedule' ? '#F0FDF4' : '#FFFFFF',
+                  cursor: 'pointer',
+                  flex: 1.5
+                }}
+              >
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  border: '2px solid #94A3B8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {deliveryType === 'schedule' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#006666' }} />}
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>Schedule send</div>
+                  <div style={{ fontSize: '11px', color: '#64748B' }}>Choose a date and time</div>
+                </div>
 
                 {/* Date Picker */}
                 <div style={{
@@ -931,18 +862,18 @@ Your Company Ltd`
                   gap: '6px',
                   border: '1px solid #CBD5E1',
                   borderRadius: '6px',
-                  padding: '6px 10px',
+                  padding: '4px 8px',
                   fontSize: '12px',
                   background: '#FFFFFF',
-                  opacity: sendType === 'schedule' ? 1 : 0.6
+                  marginLeft: 'auto'
                 }}>
-                  <Calendar size={14} color="#64748B" />
+                  <Calendar size={13} color="#64748B" />
                   <input 
                     type="date"
                     value={scheduleDate}
                     onChange={(e) => setScheduleDate(e.target.value)}
-                    disabled={sendType !== 'schedule'}
-                    style={{ border: 'none', outline: 'none', fontSize: '12px', color: '#0F172A', background: 'transparent' }}
+                    disabled={deliveryType !== 'schedule'}
+                    style={{ border: 'none', outline: 'none', fontSize: '11.5px', color: '#0F172A', background: 'transparent' }}
                   />
                 </div>
 
@@ -953,583 +884,444 @@ Your Company Ltd`
                   gap: '6px',
                   border: '1px solid #CBD5E1',
                   borderRadius: '6px',
-                  padding: '6px 10px',
+                  padding: '4px 8px',
                   fontSize: '12px',
-                  background: '#FFFFFF',
-                  opacity: sendType === 'schedule' ? 1 : 0.6
+                  background: '#FFFFFF'
                 }}>
-                  <Clock size={14} color="#64748B" />
+                  <Clock size={13} color="#64748B" />
                   <input 
                     type="text"
                     value={scheduleTime}
                     onChange={(e) => setScheduleTime(e.target.value)}
-                    disabled={sendType !== 'schedule'}
-                    style={{ border: 'none', outline: 'none', fontSize: '12px', color: '#0F172A', width: '45px', background: 'transparent' }}
+                    disabled={deliveryType !== 'schedule'}
+                    style={{ border: 'none', outline: 'none', fontSize: '11.5px', color: '#0F172A', width: '38px', background: 'transparent' }}
                   />
-                  <CaretDown size={12} color="#64748B" />
                 </div>
               </div>
 
             </div>
+
+            {/* Three Toggle Switches */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', paddingTop: '10px', borderTop: '1px solid #F1F5F9' }}>
+              
+              {/* Toggle 1: Send me a copy */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <div 
+                  onClick={() => setSendMeCopy(!sendMeCopy)}
+                  style={{
+                    width: '38px',
+                    height: '20px',
+                    borderRadius: '999px',
+                    background: sendMeCopy ? '#006666' : '#CBD5E1',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    marginTop: '2px',
+                    flexShrink: 0
+                  }}
+                >
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    position: 'absolute',
+                    top: '2px',
+                    left: sendMeCopy ? '20px' : '2px',
+                    transition: 'left 0.2s'
+                  }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#0F172A' }}>Send me a copy</div>
+                  <div style={{ fontSize: '11px', color: '#64748B', marginTop: '1px' }}>Receive a copy of this email at john.doe@tessmaone.co.uk</div>
+                </div>
+              </div>
+
+              {/* Toggle 2: Request read receipt */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <div 
+                  onClick={() => setRequestReadReceipt(!requestReadReceipt)}
+                  style={{
+                    width: '38px',
+                    height: '20px',
+                    borderRadius: '999px',
+                    background: requestReadReceipt ? '#006666' : '#CBD5E1',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    marginTop: '2px',
+                    flexShrink: 0
+                  }}
+                >
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    position: 'absolute',
+                    top: '2px',
+                    left: requestReadReceipt ? '20px' : '2px',
+                    transition: 'left 0.2s'
+                  }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#0F172A' }}>Request read receipt</div>
+                  <div style={{ fontSize: '11px', color: '#64748B', marginTop: '1px' }}>Ask the recipient to confirm when they have read this email</div>
+                </div>
+              </div>
+
+              {/* Toggle 3: Save as default message */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <div 
+                  onClick={() => setSaveAsDefault(!saveAsDefault)}
+                  style={{
+                    width: '38px',
+                    height: '20px',
+                    borderRadius: '999px',
+                    background: saveAsDefault ? '#006666' : '#CBD5E1',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    marginTop: '2px',
+                    flexShrink: 0
+                  }}
+                >
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: '#FFFFFF',
+                    position: 'absolute',
+                    top: '2px',
+                    left: saveAsDefault ? '20px' : '2px',
+                    transition: 'left 0.2s'
+                  }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#0F172A' }}>Save as default message</div>
+                  <div style={{ fontSize: '11px', color: '#64748B', marginTop: '1px' }}>Use this message as the default for future invoices</div>
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
         </div>
 
-        {/* ════ RIGHT COLUMN: INVOICE PREVIEW & DOCUMENT SUMMARY & ACTIONS ════ */}
+        {/* ════ RIGHT COLUMN: EMAIL PREVIEW (DESKTOP/MOBILE), ATTACHED DOCS & DELIVERY HISTORY ════ */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* Card 1: Invoice Preview Thumbnail */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
+          {/* Card 1: Email Preview */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px 24px' }}>
+            
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
-                Invoice Preview
-              </h3>
-              <button 
-                onClick={() => setIsPreviewOpen(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#0284C7',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                <ArrowSquareOut size={14} />
-                <span>Open in new tab</span>
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <EnvelopeSimple size={16} color="#059669" weight="bold" />
+                <div>
+                  <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                    Email preview
+                  </h3>
+                  <div style={{ fontSize: '11px', color: '#64748B' }}>
+                    This is how the email will look to the recipient.
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop / Mobile Switcher */}
+              <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '6px', padding: '2px' }}>
+                <button 
+                  onClick={() => setPreviewDevice('desktop')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 10px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    background: previewDevice === 'desktop' ? '#FFFFFF' : 'transparent',
+                    color: previewDevice === 'desktop' ? '#0F172A' : '#64748B',
+                    fontWeight: 600,
+                    fontSize: '11.5px',
+                    cursor: 'pointer',
+                    boxShadow: previewDevice === 'desktop' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none'
+                  }}
+                >
+                  <Desktop size={14} />
+                  <span>Desktop</span>
+                </button>
+                <button 
+                  onClick={() => setPreviewDevice('mobile')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 10px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    background: previewDevice === 'mobile' ? '#FFFFFF' : 'transparent',
+                    color: previewDevice === 'mobile' ? '#0F172A' : '#64748B',
+                    fontWeight: 600,
+                    fontSize: '11.5px',
+                    cursor: 'pointer',
+                    boxShadow: previewDevice === 'mobile' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none'
+                  }}
+                >
+                  <DeviceMobile size={14} />
+                  <span>Mobile</span>
+                </button>
+              </div>
             </div>
 
-            {/* Thumbnail Canvas Representation */}
+            {/* Simulated Email Container */}
             <div style={{
               background: '#FFFFFF',
               border: '1px solid #E2E8F0',
               borderRadius: '8px',
-              padding: '18px 20px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-              fontSize: '11px',
-              lineHeight: 1.4,
-              color: '#334155'
+              padding: '16px 20px',
+              fontSize: '12px',
+              color: '#334155',
+              maxWidth: previewDevice === 'mobile' ? '340px' : '100%',
+              margin: '0 auto',
+              transition: 'all 0.3s'
             }}>
-              {/* Header inside preview */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' }}>
-                    <Buildings size={16} />
+              {/* Email metadata header */}
+              <div style={{ borderBottom: '1px solid #F1F5F9', paddingBottom: '12px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11.5px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span style={{ color: '#64748B', width: '55px' }}>From:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>TESSMA ONE Finance &lt;finance@tessmaone.co.uk&gt;</span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span style={{ color: '#64748B', width: '55px' }}>To:</span>
+                  <span style={{ color: '#0F172A' }}>{toRecipients.map(r => r.email).join(', ') || 'recipient@domain.com'}</span>
+                </div>
+                {ccRecipients.length > 0 && (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <span style={{ color: '#64748B', width: '55px' }}>Cc:</span>
+                    <span style={{ color: '#0F172A' }}>{ccRecipients.map(r => r.email).join(', ')}</span>
                   </div>
-                  <span style={{ fontWeight: 700, fontSize: '13px', color: '#0F172A' }}>Your Company Ltd</span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.04em' }}>INVOICE</div>
-                  <div style={{ fontSize: '10px', color: '#64748B', marginTop: '2px' }}>Invoice No: <span style={{ color: '#0F172A', fontWeight: 600 }}>INV-2025-0042</span></div>
-                  <div style={{ fontSize: '10px', color: '#64748B' }}>Issue Date: <span style={{ color: '#0F172A', fontWeight: 600 }}>01 Apr 2025</span></div>
-                  <div style={{ fontSize: '10px', color: '#64748B' }}>Due Date: <span style={{ color: '#0F172A', fontWeight: 600 }}>30 Apr 2025</span></div>
+                )}
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span style={{ color: '#64748B', width: '55px' }}>Subject:</span>
+                  <span style={{ fontWeight: 600, color: '#0F172A' }}>{subject}</span>
                 </div>
               </div>
 
-              {/* Client address */}
-              <div style={{ marginBottom: '14px', fontSize: '10.5px', color: '#64748B' }}>
-                <div style={{ fontWeight: 700, color: '#0F172A' }}>ABC Solutions Ltd</div>
-                <div>123 Business Park</div>
-                <div>London</div>
-                <div>SW1A 1AA</div>
-                <div>United Kingdom</div>
-              </div>
-
-              {/* Items table */}
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px', marginBottom: '14px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #CBD5E1', textAlign: 'left', color: '#64748B' }}>
-                    <th style={{ padding: '4px 0', fontWeight: 600 }}>Description</th>
-                    <th style={{ padding: '4px 0', textAlign: 'center', fontWeight: 600 }}>Qty</th>
-                    <th style={{ padding: '4px 0', textAlign: 'right', fontWeight: 600 }}>Unit Price</th>
-                    <th style={{ padding: '4px 0', textAlign: 'right', fontWeight: 600 }}>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
-                    <td style={{ padding: '6px 0', color: '#0F172A' }}>Website Redesign</td>
-                    <td style={{ padding: '6px 0', textAlign: 'center' }}>1</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}>£5,000.00</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>£5,000.00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
-                    <td style={{ padding: '6px 0', color: '#0F172A' }}>Ongoing Support (Monthly)</td>
-                    <td style={{ padding: '6px 0', textAlign: 'center' }}>3</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}>£500.00</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>£1,500.00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
-                    <td style={{ padding: '6px 0', color: '#0F172A' }}>Training & Onboarding</td>
-                    <td style={{ padding: '6px 0', textAlign: 'center' }}>1</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right' }}>£750.00</td>
-                    <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>£750.00</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {/* Totals */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', alignItems: 'flex-end', fontSize: '10.5px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '130px', color: '#64748B' }}>
-                  <span>Subtotal</span>
-                  <span>£7,250.00</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '130px', color: '#64748B' }}>
-                  <span>VAT (20%)</span>
-                  <span>£1,450.00</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '130px', fontWeight: 800, color: '#0F172A', fontSize: '12px', borderTop: '1px solid #E2E8F0', paddingTop: '4px', marginTop: '2px' }}>
-                  <span>Total</span>
-                  <span>£8,700.00</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: Document Summary */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
-                Document Summary
-              </h3>
-              <button 
-                onClick={() => showToast('Navigating to Invoice Editor...')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#0284C7',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                <PencilSimple size={14} />
-                <span>Edit Invoice</span>
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12.5px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#64748B' }}>Invoice Number</span>
-                <span style={{ fontWeight: 600, color: '#0F172A' }}>INV-2025-0042</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#64748B' }}>Customer</span>
-                <span style={{ fontWeight: 600, color: '#0F172A' }}>ABC Solutions Ltd</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#64748B' }}>Invoice Amount</span>
-                <span style={{ fontWeight: 700, color: '#0F172A' }}>£8,700.00</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#64748B' }}>Due Date</span>
-                <span style={{ fontWeight: 600, color: '#0F172A' }}>
-                  30 Apr 2025 <span style={{ color: '#16A34A', fontSize: '11.5px', fontWeight: 500 }}>(in 29 days)</span>
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#64748B' }}>Template</span>
-                <span style={{ fontWeight: 600, color: '#0F172A' }}>Standard Invoice</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#64748B' }}>Attachments</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#0F172A', fontWeight: 500 }}>
-                  <FilePdf size={14} color="#64748B" />
-                  <span>2 files (Invoice PDF, Statement)</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Selected Contacts */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
-                Selected Contacts
-              </h3>
-              <button 
-                onClick={() => showToast('Edit contact selection modal')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#0284C7',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                <PencilSimple size={14} />
-                <span>Edit</span>
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  background: '#8B5CF6',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  SL
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '13px' }}>Sarah Lawson</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B' }}>Finance Manager</div>
-                  <div style={{ fontSize: '11px', color: '#64748B' }}>sarah.lawson@abcsolutions.co.uk</div>
-                </div>
-              </div>
-
-              <span style={{
-                background: '#E0F2FE',
-                color: '#0284C7',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                fontSize: '11px',
-                fontWeight: 600
-              }}>
-                Primary
-              </span>
-            </div>
-          </div>
-
-          {/* Card 4: Recent Delivery Activity */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
-                Recent Delivery Activity
-              </h3>
-              <button 
-                onClick={() => showToast('Full delivery logs view')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#0284C7',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                View all
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              {/* TESSMA ONE BRANDING LOGO */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                 <div style={{
                   width: '28px',
                   height: '28px',
-                  borderRadius: '50%',
-                  background: '#E0F2FE',
+                  borderRadius: '6px',
+                  background: '#009A96',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0284C7',
-                  flexShrink: 0
+                  color: '#FFFFFF'
                 }}>
-                  <EnvelopeSimple size={16} />
+                  <div style={{ width: '12px', height: '12px', border: '2.5px solid #FFFFFF', transform: 'rotate(45deg)' }} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#0F172A' }}>Draft created</div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>Invoice ready to be sent</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', letterSpacing: '0.04em' }}>TESSMA</div>
+                  <div style={{ fontSize: '9px', fontWeight: 700, color: '#009A96', marginTop: '-2px' }}>ONE</div>
                 </div>
               </div>
 
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '11.5px', color: '#64748B' }}>01 Apr 2025, 10:24</div>
-                <div style={{ fontSize: '11px', color: '#94A3B8' }}>John Doe</div>
+              {/* Dynamic Email Body */}
+              <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '12px', color: '#1E293B', marginBottom: '24px' }}>
+                {message}
               </div>
+
+              {/* Footer */}
+              <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: '12px', fontSize: '10.5px', color: '#94A3B8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#64748B' }}>TESSMA ONE</div>
+                  <div>Smarter business management for professional services</div>
+                </div>
+                <span style={{ color: '#0284C7' }}>www.tessmaone.co.uk</span>
+              </div>
+
             </div>
           </div>
 
-          {/* Action Buttons Bar */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: '10px',
-            paddingTop: '6px'
-          }}>
-            <button 
-              onClick={() => showToast('Action cancelled')}
-              style={{
-                padding: '9px 16px',
-                background: '#FFFFFF',
-                border: '1px solid #CBD5E1',
-                borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#475569',
-                cursor: 'pointer'
-              }}
-            >
-              Cancel
-            </button>
+          {/* Card 2: Attached Documents (2) */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <EnvelopeSimple size={16} color="#059669" weight="bold" />
+                <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                  Attached documents ({attachments.length})
+                </h3>
+              </div>
+              <button 
+                onClick={() => showToast('Downloading all attachments in a zip...')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#0284C7',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                <DownloadSimple size={14} />
+                <span>Download all</span>
+              </button>
+            </div>
 
-            <button 
-              onClick={() => setIsPreviewOpen(true)}
-              style={{
-                padding: '9px 16px',
-                background: '#EFF6FF',
-                border: '1px solid #BFDBFE',
+            {/* Document preview tiles */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              
+              {/* Tile 1 */}
+              <div style={{
+                border: '1px solid #E2E8F0',
                 borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#2563EB',
-                cursor: 'pointer'
-              }}
-            >
-              Preview email
-            </button>
-
-            <button 
-              onClick={() => {
-                saveFormData();
-                showToast('Draft successfully saved with all filled details!');
-              }}
-              style={{
-                padding: '9px 16px',
-                background: '#FFFFFF',
-                border: '1px solid #CBD5E1',
-                borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#334155',
-                cursor: 'pointer'
-              }}
-            >
-              Save draft
-            </button>
-
-            <button 
-              onClick={() => {
-                saveFormData();
-                showToast(sendType === 'now' 
-                  ? 'Invoice INV-2025-0042 sent successfully to Sarah Lawson!' 
-                  : `Invoice scheduled to send on ${scheduleDate} at ${scheduleTime}!`
-                );
-              }}
-              style={{
-                padding: '9px 20px',
-                background: '#006666',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#FFFFFF',
+                padding: '12px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-              }}
-            >
-              <PaperPlaneTilt size={16} weight="bold" />
-              <span>Send invoice</span>
-            </button>
+                gap: '10px',
+                background: '#FFFFFF'
+              }}>
+                <div style={{
+                  width: '32px',
+                  height: '40px',
+                  borderRadius: '4px',
+                  background: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#DC2626'
+                }}>
+                  <FilePdf size={20} weight="fill" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    INV-2025-0423.pdf
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#64748B' }}>245 KB</div>
+                </div>
+                <button 
+                  onClick={() => showToast('Downloading INV-2025-0423.pdf')}
+                  style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: '4px' }}
+                >
+                  <DownloadSimple size={15} />
+                </button>
+              </div>
+
+              {/* Tile 2 */}
+              <div style={{
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                padding: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: '#FFFFFF'
+              }}>
+                <div style={{
+                  width: '32px',
+                  height: '40px',
+                  borderRadius: '4px',
+                  background: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#2563EB'
+                }}>
+                  <FileDoc size={20} weight="fill" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    Project acceptance certificate.pdf
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#64748B' }}>1.2 MB</div>
+                </div>
+                <button 
+                  onClick={() => showToast('Downloading Project acceptance certificate.pdf')}
+                  style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: '4px' }}
+                >
+                  <DownloadSimple size={15} />
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Card 3: Delivery History */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ClockCounterClockwise size={16} color="#059669" weight="bold" />
+                <div>
+                  <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                    Delivery history
+                  </h3>
+                  <div style={{ fontSize: '11px', color: '#64748B' }}>
+                    A record of emails sent for this invoice.
+                  </div>
+                </div>
+              </div>
+
+              <Link href="#" style={{ fontSize: '12px', color: '#0284C7', textDecoration: 'none', fontWeight: 600 }}>
+                View all &gt;
+              </Link>
+            </div>
+
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11.5px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #E2E8F0', textAlign: 'left', color: '#64748B' }}>
+                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Date & time</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Status</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Recipients</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Opened</th>
+                  <th style={{ padding: '6px 4px', width: '20px' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Row 1 */}
+                <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
+                  <td style={{ padding: '10px 8px', color: '#0F172A' }}>15 Apr 2025, 14:32</td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span style={{ background: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>Sent</span>
+                  </td>
+                  <td style={{ padding: '10px 8px', color: '#64748B' }}>sarah.clarke@abc-ltd.co.uk</td>
+                  <td style={{ padding: '10px 8px', color: '#15803D', fontWeight: 600 }}>Yes</td>
+                  <td style={{ padding: '10px 4px', color: '#94A3B8', cursor: 'pointer' }}>⋮</td>
+                </tr>
+
+                {/* Row 2 */}
+                <tr style={{ borderBottom: '1px solid #F1F5F9' }}>
+                  <td style={{ padding: '10px 8px', color: '#0F172A' }}>12 Apr 2025, 09:15</td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span style={{ background: '#DBEAFE', color: '#1D4ED8', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>Opened</span>
+                  </td>
+                  <td style={{ padding: '10px 8px', color: '#64748B' }}>sarah.clarke@abc-ltd.co.uk</td>
+                  <td style={{ padding: '10px 8px', color: '#15803D', fontWeight: 600 }}>Yes</td>
+                  <td style={{ padding: '10px 4px', color: '#94A3B8', cursor: 'pointer' }}>⋮</td>
+                </tr>
+
+                {/* Row 3 */}
+                <tr>
+                  <td style={{ padding: '10px 8px', color: '#0F172A' }}>10 Apr 2025, 11:20</td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span style={{ background: '#F1F5F9', color: '#475569', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>Draft</span>
+                  </td>
+                  <td style={{ padding: '10px 8px', color: '#94A3B8' }}>—</td>
+                  <td style={{ padding: '10px 8px', color: '#94A3B8' }}>—</td>
+                  <td style={{ padding: '10px 4px', color: '#94A3B8', cursor: 'pointer' }}>⋮</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
         </div>
 
       </div>
-
-      {/* ── EMAIL PREVIEW MODAL ── */}
-      {isPreviewOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(3px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{
-            background: '#FFFFFF',
-            borderRadius: '16px',
-            width: '680px',
-            maxWidth: '92%',
-            maxHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
-          }}>
-            {/* Modal Header */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '18px 24px',
-              borderBottom: '1px solid #E2E8F0',
-              background: '#F8FAFC'
-            }}>
-              <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A', margin: 0 }}>
-                  Email Preview
-                </h3>
-                <p style={{ fontSize: '12px', color: '#64748B', margin: '2px 0 0 0' }}>
-                  This is how the email will look to your recipient.
-                </p>
-              </div>
-              <button 
-                onClick={() => setIsPreviewOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Email Message Content Body */}
-            <div style={{ padding: '24px', overflowY: 'auto', flex: 1, fontSize: '13px', lineHeight: '1.6', color: '#0F172A' }}>
-              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '12px 16px', marginBottom: '18px', fontSize: '12px' }}>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
-                  <span style={{ color: '#64748B', width: '60px' }}>From:</span>
-                  <span style={{ fontWeight: 600 }}>Your Company &lt;{replyTo}&gt;</span>
-                </div>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
-                  <span style={{ color: '#64748B', width: '60px' }}>To:</span>
-                  <span style={{ fontWeight: 600 }}>{toRecipients.map(r => `${r.name} <${r.email}>`).join(', ')}</span>
-                </div>
-                {ccRecipients.length > 0 && (
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
-                    <span style={{ color: '#64748B', width: '60px' }}>Cc:</span>
-                    <span>{ccRecipients.map(r => `${r.name} <${r.email}>`).join(', ')}</span>
-                  </div>
-                )}
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <span style={{ color: '#64748B', width: '60px' }}>Subject:</span>
-                  <span style={{ fontWeight: 700, color: '#0F172A' }}>{subject}</span>
-                </div>
-              </div>
-
-              {/* Render dynamic message replacing placeholders */}
-              <div style={{ whiteSpace: 'pre-wrap', marginBottom: '20px' }}>
-                {message
-                  .replace(/\{\{contact_name\}\}/g, 'Sarah Lawson')
-                  .replace(/\{\{invoice_number\}\}/g, 'INV-2025-0042')
-                  .replace(/\{\{invoice_amount\}\}/g, '£8,700.00')}
-              </div>
-
-              {/* Payment Link Card if enabled */}
-              {includePaymentLink && (
-                <div style={{
-                  background: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  borderRadius: '10px',
-                  padding: '16px',
-                  marginBottom: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}>
-                  <div>
-                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#065F46' }}>Pay Online Securely</div>
-                    <div style={{ fontSize: '12px', color: '#047857' }}>Card, Bank Transfer, or Apple Pay</div>
-                  </div>
-                  <button style={{
-                    padding: '8px 16px',
-                    background: '#059669',
-                    border: 'none',
-                    borderRadius: '6px',
-                    color: '#FFFFFF',
-                    fontWeight: 600,
-                    fontSize: '12.5px',
-                    cursor: 'pointer'
-                  }}>
-                    Pay £8,700.00
-                  </button>
-                </div>
-              )}
-
-              {/* Attachments preview */}
-              <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '16px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748B', marginBottom: '8px' }}>
-                  Attachments ({attachPdf ? (attachStatement ? '2' : '1') : (attachStatement ? '1' : '0')})
-                </div>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {attachPdf && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '6px 12px',
-                      background: '#F1F5F9',
-                      border: '1px solid #CBD5E1',
-                      borderRadius: '6px',
-                      fontSize: '12px'
-                    }}>
-                      <FilePdf size={16} color="#DC2626" weight="fill" />
-                      <span>INV-2025-0042.pdf (184 KB)</span>
-                    </div>
-                  )}
-                  {attachStatement && (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '6px 12px',
-                      background: '#F1F5F9',
-                      border: '1px solid #CBD5E1',
-                      borderRadius: '6px',
-                      fontSize: '12px'
-                    }}>
-                      <FilePdf size={16} color="#DC2626" weight="fill" />
-                      <span>Statement_Apr2025.pdf (92 KB)</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '10px',
-              padding: '14px 24px',
-              borderTop: '1px solid #E2E8F0',
-              background: '#F8FAFC'
-            }}>
-              <button 
-                onClick={() => setIsPreviewOpen(false)}
-                style={{
-                  padding: '8px 16px',
-                  background: '#FFFFFF',
-                  border: '1px solid #CBD5E1',
-                  borderRadius: '6px',
-                  fontSize: '12.5px',
-                  fontWeight: 600,
-                  color: '#475569',
-                  cursor: 'pointer'
-                }}
-              >
-                Close preview
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
