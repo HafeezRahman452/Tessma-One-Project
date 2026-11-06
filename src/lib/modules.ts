@@ -192,6 +192,8 @@ export const ALL_MODULES: ModuleDefinition[] = [
       { name: 'Receivables Aging', href: '/designs/receivables-aging' },
       { name: 'New Supplier Bill', href: '/designs/new-supplier-bill' },
       { name: 'New Journal', href: '/designs/new-journal' },
+      { name: 'Sales invoice detail', href: '/designs/sales-invoice-detail' },
+      { name: 'PDF Preview', href: '/designs/pdf-preview' },
       { name: 'Branding and Company Identity', href: '/designs/branding-company-identity' },
       { name: 'Document Branding', href: '/designs/document-branding' },
       { name: 'Delivery History', href: '/designs/delivery-history' },
