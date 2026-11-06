@@ -187,6 +187,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
     subItems: [
       { name: 'Customer Detail', href: '/designs/customer-detail' },
       { name: 'Supplier Details', href: '/designs/supplier-detail' },
+      { name: 'Supplier Bill Detail', href: '/designs/supplier-bill-detail' },
       { name: 'Credit Note Template Library', href: '/designs/credit-note-templates' },
       { name: 'Template Library', href: '/finance/branding/template-library' },
       { name: 'Invoice Designer', href: '/finance/branding' },

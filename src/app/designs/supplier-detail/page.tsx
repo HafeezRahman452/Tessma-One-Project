@@ -610,7 +610,7 @@ export default function SupplierDetailPage() {
                 Open Bills
               </h3>
             </div>
-            <Link href="/finance/purchase-invoices" style={{ fontSize: '12px', color: '#0284C7', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Link href="/designs/supplier-bill-detail" style={{ fontSize: '12px', color: '#0284C7', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>View All</span>
               <span>&gt;</span>
             </Link>
