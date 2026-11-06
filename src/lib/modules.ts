@@ -189,6 +189,7 @@ export const ALL_MODULES: ModuleDefinition[] = [
       { name: 'Credit Note Template Library', href: '/designs/credit-note-templates' },
       { name: 'Template Library', href: '/finance/branding/template-library' },
       { name: 'Invoice Designer', href: '/finance/branding' },
+      { name: 'Default Invoice Template', href: '/designs/default-invoice-template' },
       { name: 'Template Selection', href: '/finance/branding/invoice-selection' },
       { name: 'Template Preview', href: '/finance/branding/template-preview' },
       { name: 'Sales Document Branding', href: '/finance/sales/document-branding' },
@@ -338,6 +339,7 @@ export const INITIAL_SUBSCRIBED_MODULES = [
   'reports',
   'settings'
 ];
+
 
 
 
